@@ -71,10 +71,11 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "core.custom_middleware.RequiredCheckTokenSignature",
 ]
 
 ROOT_URLCONF = "core.urls"
-STATIC_ROOT = os.path.join(BASE_DIR, "./public/static")
+
 
 TEMPLATES = [
     {
@@ -145,7 +146,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "./public/static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -179,3 +181,14 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 }
+
+USE_I18N = True
+
+LANGUAGES = [
+    ("en", "English"),
+]
+
+# Set path to your app's locale directory
+LOCALE_PATHS = [
+    # os.path.join(BASE_DIR, 'locale'),
+]

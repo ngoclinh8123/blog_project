@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Customer, Staff
+from apps.auth.basic_auth.models import User, Customer, Staff
 
 # Register your models here.
 fields = list(UserAdmin.fieldsets)

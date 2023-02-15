@@ -12,11 +12,18 @@ class BaseModel(models.Model):
 
 
 class CustomResponse:
-    def success(self, message="success"):
-        return Response(message, status=status.HTTP_200_OK)
+    def success_response(self, message="", data=None, status=200):
+        response_data = {
+            "success": True,
+            "message": message,
+            "data": data,
+        }
+        return Response(response_data, status=status)
 
-    def fail(self, message="fail"):
-        return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
-    def data(self, data):
-        return Response(data, status=status.HTTP_200_OK)
+    def fail_response(self, message="", data=None, status=400):
+        response_data = {
+            "success": False,
+            "message": message,
+            "data": data,
+        }
+        return Response(response_data, status=status)

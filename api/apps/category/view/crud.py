@@ -1,85 +1,88 @@
 from django.shortcuts import get_object_or_404
-
+from django.utils.translation import gettext
 from rest_framework import viewsets
 from rest_framework.decorators import action
-
-from ..models import Category, Post_Category
-from ..custom_permission import CustomPermission
-from ..helper.sr import CategorySr, AddCategorySr, PostCategorySr
-from ...public.util import nest_delete, nest_create
-from ...public.models import CustomResponse
-from ...public.decorator import requires_check_token_signature
+from apps.category.models import Category, Post_Category
+from apps.category.custom_permission import CustomPermission
+from apps.category.helper.sr import CategorySr, AddCategorySr, PostCategorySr
+from apps.public.util import Nest
+from apps.public.models import CustomResponse
 
 
 class CategoryView(viewsets.GenericViewSet):
     permission_classes = (CustomPermission,)
     queryset = Category.objects.all()
 
-    @requires_check_token_signature
     def list(self, request):
         data = Category.objects.all()
         serializer = CategorySr(data, many=True)
-        data = nest_create(serializer.data)
-        return CustomResponse.data(self, data)
+        data = Nest.nest_create(self, serializer.data)
+        message = gettext("Retrieved categories successfully.")
+        return CustomResponse.success_response(self, message, data)
 
-    @requires_check_token_signature
     @action(methods=["post"], detail=False)
     def add(self, request):
         serializer = AddCategorySr(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return CustomResponse.success(self)
-        return CustomResponse.fail(self)
+            message = gettext("Added category successfully.")
+            return CustomResponse.success_response(self, message)
+        message = gettext("Added category failed.")
+        return CustomResponse.fail_response(self, message)
 
-    @requires_check_token_signature
     @action(methods=["put"], detail=True)
     def change(self, request, pk=None):
         obj = get_object_or_404(Category, pk=pk)
         serializer = CategorySr(obj, request.data)
         if serializer.is_valid():
             serializer.save()
-            return CustomResponse.success(self)
-        return CustomResponse.fail(self)
+            message = gettext("Updated category successfully.")
+            return CustomResponse.success_response(self, message)
+        message = gettext("Updated category failed.")
+        return CustomResponse.fail_response(self, message)
 
-    @requires_check_token_signature
     @action(methods=["delete"], detail=True)
     def delete(self, request, pk=None):
-        if nest_delete(Category, pk):
-            return CustomResponse.success(self)
-        return CustomResponse.fail(self)
+        if Nest.nest_delete(self, Category, pk):
+            message = gettext("Deleted category successfully.")
+            return CustomResponse.success_response(self, message)
+        message = gettext("Deleted category failed.")
+        return CustomResponse.fail_response(self, message)
 
 
 class PostCategoryView(viewsets.GenericViewSet):
     queryset = Post_Category.objects.all()
 
-    @requires_check_token_signature
     def list(self, request):
         data = Post_Category.objects.all()
         serializer = PostCategorySr(data, many=True)
-        return CustomResponse.data(self, serializer.data)
+        message = gettext("Retrieved items successfully.")
+        return CustomResponse.success_response(self, message, serializer.data)
 
-    @requires_check_token_signature
     @action(methods=["post"], detail=False)
     def add(self, request):
         serializer = PostCategorySr(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return CustomResponse.success(self)
-        return CustomResponse.fail(self)
+            message = gettext("Added item successfully.")
+            return CustomResponse.success_response(self, message)
+        message = gettext("Added item failed.")
+        return CustomResponse.fail_response(self, message)
 
-    @requires_check_token_signature
     @action(methods=["put"], detail=True)
     def change(self, request, pk=None):
         obj = get_object_or_404(Post_Category, pk=pk)
         serializer = PostCategorySr(obj, request.data)
         if serializer.is_valid():
             serializer.save()
-            return CustomResponse.success(self)
-        return CustomResponse.fail(self)
+            message = gettext("Updated item successfully.")
+            return CustomResponse.success_response(self, message)
+        message = gettext("Updated item failed.")
+        return CustomResponse.fail_response(self, message)
 
-    @requires_check_token_signature
     @action(methods=["delete"], detail=True)
     def delete(self, request, pk=None):
         obj = get_object_or_404(Post_Category, pk=pk)
         obj.delete()
-        return CustomResponse.success(self)
+        message = gettext("Deleted item successfully.")
+        return CustomResponse.success_response(self, message)

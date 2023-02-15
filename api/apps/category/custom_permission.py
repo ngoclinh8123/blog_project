@@ -1,8 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 
-from .models import Category
-
 
 class CustomPermission(permissions.BasePermission):
     def has_permission(self, request, view):

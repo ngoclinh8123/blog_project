@@ -1,5 +1,5 @@
 from rest_framework import routers
-from .view.crud import CategoryView, PostCategoryView
+from apps.category.view.crud import CategoryView, PostCategoryView
 
 routerCategory = routers.SimpleRouter()
 routerCategory.register("api", CategoryView, basename="category")

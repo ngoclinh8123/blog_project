@@ -1,8 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 
-from .models import Post
-from ..auth.basic_auth.models import Customer
+from apps.post.models import Post
 
 
 class CustomPermission(permissions.BasePermission):

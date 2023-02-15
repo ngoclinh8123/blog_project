@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .view.custom import Login, Logout, TokenRefresh, ChangePassword
+from apps.auth.basic_auth.view.custom import Login, Logout, TokenRefresh, ChangePassword
 
 urlpatterns = [
     path("token/", Login.as_view()),

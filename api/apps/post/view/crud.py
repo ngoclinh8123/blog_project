@@ -1,74 +1,74 @@
 from django.shortcuts import get_object_or_404
-
+from django.utils.translation import gettext
 from rest_framework import viewsets
 from rest_framework.decorators import action
-
-from ..models import Post
-from ..helper.sr import PostSr, ChangePostSr, AddPostSr
-from ..custom_pagination import CustomPageNumberPagination, has_pagination
-from ..helper.util import create_slug
-from ..custom_permisson import CustomPermission
-from ...auth.basic_auth.models import Customer
-from ...public.models import CustomResponse
-from ...public.decorator import requires_check_token_signature
+from apps.post.models import Post
+from apps.post.helper.sr import PostSr, ChangePostSr, AddPostSr
+from apps.post.custom_pagination import CustomPageNumberPagination, has_pagination
+from apps.post.helper.util import Util
+from apps.post.custom_permisson import CustomPermission
+from apps.auth.basic_auth.models import Customer
+from apps.public.models import CustomResponse
 
 
 class PostView(viewsets.GenericViewSet):
-    _model_class = Post
-    _serializer_class = PostSr
+
     _pagination_class = CustomPageNumberPagination
-    permission_classes = [
-        CustomPermission,
-    ]
+    permission_classes = [CustomPermission]
     queryset = Post.objects.all().order_by("id")
 
-    @requires_check_token_signature
     def list(self, request):
-        data = Post.objects.filter(status=1).order_by("id")
-        posts = self._pagination_class().paginate_queryset(data, request, view=self)
-        serializer = self._serializer_class(posts, many=True)
+        queryset = Post.objects.filter(status=1).order_by("id")
+        posts = self._pagination_class().paginate_queryset(queryset, request, view=self)
+        serializer = PostSr(posts, many=True)
         result = {
             "items": serializer.data,
             "pagination": has_pagination(request, self.queryset.count()),
         }
-        return CustomResponse.data(self, result)
+        message = gettext("Retrieved posts successfully.")
+        return CustomResponse.success_response(self, message, result)
 
-    @requires_check_token_signature
     def retrieve(self, request, pk=None):
-        obj = get_object_or_404(self._model_class, pk=pk)
-        serializer = self._serializer_class(obj)
-        return CustomResponse.data(self, serializer.data)
+        post = get_object_or_404(Post, pk=pk)
+        serializer = PostSr(post)
+        message = gettext("Retrieved post successfully.")
+        return CustomResponse.success_response(self, message, serializer.data)
 
-    @requires_check_token_signature
     @action(methods=["post"], detail=False)
     def add(self, request):
-        slug = create_slug(100, request.data["title"])
-        request.data["slug"] = slug
         customer = get_object_or_404(Customer, user=request.user.id)
-        request.data["customer"] = customer.id
-        request.data["mod"] = 1
-        serializer = AddPostSr(data=request.data)
+        data = request.data.copy()
+        data.update(
+            {
+                "slug": Util.create_slug(self, 100, data["title"]),
+                "customer": customer.id,
+                "mod": 1,
+            }
+        )
+        serializer = AddPostSr(data=data)
         if serializer.is_valid():
             serializer.save()
-            return CustomResponse.success(self)
-        else:
-            return CustomResponse.fail(self)
+            message = gettext("Created post successfully.")
+            return CustomResponse.success_response(self, message)
+        message = gettext("Failed to create post.")
+        return CustomResponse.fail_response(self, message)
 
-    @requires_check_token_signature
     @action(methods=["put"], detail=True)
     def change(self, request, pk=None):
-        obj = get_object_or_404(self._model_class, pk=pk)
-        slug = create_slug(100, request.data["title"])
-        request.data["slug"] = slug
-        serializer = ChangePostSr(obj, data=request.data)
+        post = get_object_or_404(Post, pk=pk)
+        data = request.data.copy()
+        data["slug"] = Util.create_slug(self, 100, data["title"])
+        serializer = ChangePostSr(post, data=data)
         if serializer.is_valid():
             serializer.save()
-            return CustomResponse.success(self)
-        return CustomResponse.fail(self)
+            message = gettext("Updated post successfully.")
+            return CustomResponse.success_response(self, message)
+        message = gettext("Failed to update post.")
+        return CustomResponse.fail_response(self, message)
 
-    @requires_check_token_signature
     @action(methods=["delete"], detail=True)
     def delete(self, request, pk=None):
-        obj = get_object_or_404(self._model_class, pk=pk)
-        obj.delete()
-        return CustomResponse.success(self)
+        post = get_object_or_404(Post, pk=pk)
+        post.delete()
+        message = gettext("Deleted post successfully.")
+        return CustomResponse.success_response(self, message)

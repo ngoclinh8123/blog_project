@@ -1,5 +1,5 @@
 from rest_framework import routers
-from .view.crud import TagView, TagPostView
+from apps.tag.view.crud import TagView, TagPostView
 
 routerTag = routers.SimpleRouter()
 routerTag.register("api", TagView, basename="post")

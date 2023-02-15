@@ -27,9 +27,9 @@ from apps.tag.route import routerTag
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("tag/", include(routerTag.urls)),
-    path("post/", include(routerPost.urls)),
-    path("comment/", include(routerComment.urls)),
-    path("category/", include(routerCategory.urls)),
+    path("tags/", include(routerTag.urls)),
+    path("posts/", include(routerPost.urls)),
+    path("comments/", include(routerComment.urls)),
+    path("categories/", include(routerCategory.urls)),
     path("auth/", include("apps.auth.basic_auth.url")),
 ]
