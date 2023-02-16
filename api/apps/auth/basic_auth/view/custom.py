@@ -1,11 +1,9 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login
 from django.utils.translation import gettext
-from rest_framework import status
 from rest_framework import permissions
 from rest_framework import generics
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from apps.auth.basic_auth.models import User
 from apps.auth.basic_auth.helper.sr import ChangePasswordSr
 from apps.auth.basic_auth.helper.util import Util
@@ -64,9 +62,10 @@ class ChangePassword(generics.UpdateAPIView):
 
 
 class Logout(APIView):
-    permission_classes = (permissions.AllowAny,)
-
     def post(self, request):
-        User.objects.filter(username=request.user.username).update(token_signature="")
+        token = request.META.get("HTTP_AUTHORIZATION", " ").split(" ")[1]
+        if token != "":
+            signature = token.split(".")[-1]
+            User.objects.filter(token_signature=signature).update(token_signature="")
         message = gettext("Logout successfully.")
         return CustomResponse.success_response(self, message)

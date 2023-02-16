@@ -1,3 +1,4 @@
+from django.utils.translation import gettext
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
@@ -14,9 +15,8 @@ class RequiredCheckTokenSignature:
             signature = token.split(".")[-1]
             user = User.objects.filter(token_signature=signature)
             if not user.count() > 0:
-                response = Response(
-                    data="vui long dang nhap lai", status=status.HTTP_400_BAD_REQUEST
-                )
+                message = gettext("Please login again.")
+                response = Response(data=message, status=status.HTTP_400_BAD_REQUEST)
                 response.accepted_renderer = JSONRenderer()
                 response.accepted_media_type = "application/json"
                 response.renderer_context = {}
