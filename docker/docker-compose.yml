@@ -5,9 +5,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_DB: blog_project
+        POSTGRES_USER: ${DB_USERNAME}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+        POSTGRES_DB: ${DB_NAME}
     volumes:
         - ../api/dbdata:/var/lib/postgresql/data/:delegated
     restart: unless-stopped
@@ -33,7 +33,7 @@ services:
     volumes:
       - ../api/nginx:/etc/nginx/conf.d
       - ../api/public/:/resource/public
-      # - ./ssl:/resource/ssl
+      - ${PATH_TO_SSL}:/resource/ssl
     ports:
         - "443:443"
         - "80:80"
