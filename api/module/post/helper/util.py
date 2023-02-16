@@ -3,7 +3,7 @@ import random
 from module.post.models import Post
 
 
-class Util:
+class SlugUtil:
     @staticmethod
     def convert_text(text):
         search = [

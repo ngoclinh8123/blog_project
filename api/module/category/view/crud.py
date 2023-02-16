@@ -14,8 +14,8 @@ class CategoryView(viewsets.GenericViewSet):
     queryset = Category.objects.all()
 
     def list(self, request):
-        data = Category.objects.all()
-        serializer = CategorySr(data, many=True)
+        categories = Category.objects.all()
+        serializer = CategorySr(categories, many=True)
         data = Nest.nest_create(self, serializer.data)
         message = gettext("Retrieved categories successfully.")
         return CustomResponse.success_response(self, message, data)
@@ -25,8 +25,12 @@ class CategoryView(viewsets.GenericViewSet):
         serializer = AddCategorySr(data=request.data)
         if serializer.is_valid():
             serializer.save()
+
+            # return success response
             message = gettext("Added category successfully.")
             return CustomResponse.success_response(self, message)
+
+        # else return error response
         message = gettext("Added category failed.")
         return CustomResponse.fail_response(self, message)
 
