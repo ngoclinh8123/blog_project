@@ -27,3 +27,4 @@ class Post_Category(models.Model):
 
     class Meta:
         ordering = ["-id"]
+        db_table = "posts_categories"

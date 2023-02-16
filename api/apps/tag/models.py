@@ -26,3 +26,4 @@ class Tag_Post(models.Model):
 
     class Meta:
         ordering = ["-id"]
+        db_table = "tags_posts"
