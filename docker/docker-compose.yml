@@ -9,7 +9,7 @@ services:
         POSTGRES_PASSWORD: ${DB_PASSWORD}
         POSTGRES_DB: ${DB_NAME}
     volumes:
-        - ./dockerfiles/api/dbdata:/var/lib/postgresql/data/:delegated
+        - ./api/dbdata:/var/lib/postgresql/data/:delegated
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
@@ -21,7 +21,7 @@ services:
     container_name: base_api
     build:
       context: ../api
-      dockerfile: ../docker/dockerfiles/api/Dockerfile
+      dockerfile: ../docker/dockerfiles/api
     volumes:
       - ../api:/code:delegated
     tty: true
@@ -34,9 +34,9 @@ services:
     container_name: base_nginx
     build:
       context: ../api/public
-      dockerfile: ../../docker/dockerfiles/nginx/Dockerfile
+      dockerfile: ../../docker/dockerfiles/nginx
     volumes:
-      - ./dockerfiles/api/nginx:/etc/nginx/conf.d
+      - ./api/nginx:/etc/nginx/conf.d
       - ../api/public/:/resource/public
       - ${PATH_TO_SSL}:/resource/ssl
     ports:
