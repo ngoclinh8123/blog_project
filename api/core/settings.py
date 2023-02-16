@@ -42,11 +42,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "apps.auth.basic_auth",
-    "apps.post",
-    "apps.category",
-    "apps.tag",
-    "apps.comment",
+    "module.auth.basic_auth",
+    "module.post",
+    "module.category",
+    "module.tag",
+    "module.comment",
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
@@ -71,7 +71,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "core.custom_middleware.RequiredCheckTokenSignature",
+    "service.framework.middleware.custom_middleware.RequiredCheckTokenSignature",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -156,7 +156,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=0.5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,

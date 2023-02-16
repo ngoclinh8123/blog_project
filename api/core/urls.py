@@ -17,10 +17,10 @@ from django.contrib import admin
 from django.urls import path, include
 
 
-from apps.post.route import routerPost
-from apps.comment.route import routerComment
-from apps.category.route import routerCategory
-from apps.tag.route import routerTag
+from module.post.route import routerPost
+from module.comment.route import routerComment
+from module.category.route import routerCategory
+from module.tag.route import routerTag
 
 # from apps.auth import basic_auth
 
@@ -31,5 +31,5 @@ urlpatterns = [
     path("posts/", include(routerPost.urls)),
     path("comments/", include(routerComment.urls)),
     path("categories/", include(routerCategory.urls)),
-    path("auth/", include("apps.auth.basic_auth.url")),
+    path("auth/", include("module.auth.basic_auth.url")),
 ]
