@@ -12,39 +12,30 @@ from module.public.models import CustomResponse
 
 
 class PostView(viewsets.GenericViewSet):
-
     permission_classes = [CustomPermission]
-    queryset = Post.objects.all().order_by("id")
+    queryset = Post.objects.filter(status=1).order_by("id")
 
     def list(self, request):
-        # get all posts status = 1 from database
-        posts = Post.objects.filter(status=1).order_by("id")
-
-        # pagination posts
-        posts_paginate = CustomPageNumberPagination().paginate_queryset(posts, request, view=self)
-
-        serializer = PostSr(posts_paginate, many=True)
+        # Get paginated posts with status=1
+        posts = CustomPageNumberPagination().paginate_queryset(self.queryset, request, view=self)
+        serializer = PostSr(posts, many=True)
         result = {
             "items": serializer.data,
-            "pagination": CustomPagination.has_pagination(self, request, posts.count()),
+            "pagination": CustomPagination.has_pagination(self, request, self.queryset.count()),
         }
-
-        # return success response
         message = gettext("Retrieved posts successfully.")
         return CustomResponse.success_response(self, message, result)
 
     def retrieve(self, request, pk=None):
-        post = get_object_or_404(Post, pk=pk)
+        post = get_object_or_404(self.queryset, pk=pk)
         serializer = PostSr(post)
         message = gettext("Retrieved post successfully.")
         return CustomResponse.success_response(self, message, serializer.data)
 
-    @action(methods=["post"], detail=False)
+    @action(detail=False, methods=["post"])
     def add(self, request):
         customer = get_object_or_404(Customer, user=request.user.id)
         data = request.data.copy()
-
-        # add slug, customer and mod
         data.update(
             {
                 # create slug from title and length = 100
@@ -53,42 +44,30 @@ class PostView(viewsets.GenericViewSet):
                 "mod": 1,
             }
         )
-
         serializer = AddPostSr(data=data)
         if serializer.is_valid():
             serializer.save()
-
-            # return success response
             message = gettext("Created post successfully.")
             return CustomResponse.success_response(self, message)
-
-        # else return error response
         message = gettext("Failed to create post.")
         return CustomResponse.fail_response(self, message)
 
-    @action(methods=["put"], detail=True)
+    @action(detail=True, methods=["put"])
     def change(self, request, pk=None):
-        post = get_object_or_404(Post, pk=pk)
-
-        # create new slug and add slug to request
+        post = get_object_or_404(self.queryset, pk=pk)
         data = request.data.copy()
         data["slug"] = SlugUtil.create_slug(self, 100, data["title"])
-
         serializer = ChangePostSr(post, data=data)
         if serializer.is_valid():
             serializer.save()
-
-            # return success response
             message = gettext("Updated post successfully.")
             return CustomResponse.success_response(self, message)
-
-        # else return error response
         message = gettext("Failed to update post.")
         return CustomResponse.fail_response(self, message)
 
-    @action(methods=["delete"], detail=True)
+    @action(detail=True, methods=["delete"])
     def delete(self, request, pk=None):
-        post = get_object_or_404(Post, pk=pk)
+        post = get_object_or_404(self.queryset, pk=pk)
         post.delete()
         message = gettext("Deleted post successfully.")
         return CustomResponse.success_response(self, message)

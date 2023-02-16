@@ -18,6 +18,6 @@ class TokenUtil:
 class RequestUtil:
     @staticmethod
     def get_request_data(request):
-        requestData = request.body.decode("utf-8")
-        data = ast.literal_eval(requestData)
+        request_data = request.body.decode("utf-8")
+        data = ast.literal_eval(request_data)
         return data
