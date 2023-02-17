@@ -4,8 +4,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from module.tag.models import Tag
 from module.tag.helper.sr import TagSr, AddTagSr, ChangeTagSr
-from public.utils.response_util import ResponseUtil
-from public.utils.permission_util import PermissionUtil
+from util.response_util import ResponseUtil
+from util.permission_util import PermissionUtil
 
 
 class TagView(viewsets.GenericViewSet):

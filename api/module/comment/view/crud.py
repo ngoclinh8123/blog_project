@@ -5,9 +5,9 @@ from rest_framework.decorators import action
 from module.comment.models import Comment
 from module.comment.helper.sr import CommentSr, ChangeCommentSr, AddCommentSr
 from module.auth.basic_auth.models import Customer
-from public.utils.nest_util import NestUtil
-from public.utils.response_util import ResponseUtil
-from public.utils.permission_util import PermissionUtil
+from util.nest_util import NestUtil
+from util.response_util import ResponseUtil
+from util.permission_util import PermissionUtil
 
 
 class CommentView(viewsets.GenericViewSet):
@@ -17,6 +17,7 @@ class CommentView(viewsets.GenericViewSet):
     def retrieve(self, request, pk=None):
         # get all comments of post
         comments = Comment.objects.filter(post=pk)
+        print(comments)
         serializer = CommentSr(comments, many=True)
         data = NestUtil.nest_create(self, serializer.data)
         message = gettext("Retrieved comment successfully.")

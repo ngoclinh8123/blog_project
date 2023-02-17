@@ -6,7 +6,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from module.auth.basic_auth.helper.sr import ChangePasswordSr
 from module.auth.basic_auth.helper.token_util import TokenUtil
-from public.utils.response_util import ResponseUtil
+from util.response_util import ResponseUtil
 
 User = get_user_model()
 

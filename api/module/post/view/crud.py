@@ -7,9 +7,9 @@ from module.post.models import Post
 from module.post.helper.sr import PostSr, ChangePostSr, AddPostSr
 from module.post.helper.slug_util import SlugUtil
 from module.post.custom_pagination import CustomPageNumberPagination
-from public.utils.permission_util import PermissionUtil
-from public.utils.pagination_util import PaginationUtil
-from public.utils.response_util import ResponseUtil
+from util.permission_util import PermissionUtil
+from util.pagination_util import PaginationUtil
+from util.response_util import ResponseUtil
 
 
 class PostView(viewsets.GenericViewSet):

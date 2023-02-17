@@ -1,11 +1,11 @@
 from django.db import models
 
-from public.models.base_model import BaseModel
+from util.model_util import ModelUtil
 from module.auth.basic_auth.models import Customer
 from module.post.models import Post
 
 # Create your models here.
-class Comment(BaseModel):
+class Comment(ModelUtil):
     id = models.AutoField(primary_key=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)

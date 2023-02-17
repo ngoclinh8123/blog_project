@@ -1,12 +1,12 @@
 from django.db import models
 
-from public.models.base_model import BaseModel
+from util.model_util import ModelUtil
 from module.auth.basic_auth.models import Customer, Staff
 
 # Create your models here.
 
 
-class Post(BaseModel):
+class Post(ModelUtil):
     id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     mod = models.ForeignKey(Staff, on_delete=models.CASCADE)

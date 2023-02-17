@@ -4,9 +4,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from module.category.models import Category
 from module.category.helper.sr import CategorySr, AddCategorySr, ChangeCategorySr
-from public.utils.nest_util import NestUtil
-from public.utils.response_util import ResponseUtil
-from public.utils.permission_util import PermissionUtil
+from util.nest_util import NestUtil
+from util.response_util import ResponseUtil
+from util.permission_util import PermissionUtil
 
 
 class CategoryView(viewsets.GenericViewSet):
