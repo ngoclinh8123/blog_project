@@ -3,14 +3,14 @@ from django.utils.translation import gettext
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from module.category.models import Category
-from module.category.custom_permission import CustomPermission
 from module.category.helper.sr import CategorySr, AddCategorySr, ChangeCategorySr
 from public.utils.nest_util import NestUtil
 from public.utils.response_util import ResponseUtil
+from public.utils.permission_util import PermissionUtil
 
 
 class CategoryView(viewsets.GenericViewSet):
-    permission_classes = (CustomPermission,)
+    permission_classes = (PermissionUtil,)
     queryset = Category.objects.all()
 
     def list(self, request):

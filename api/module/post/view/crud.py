@@ -2,18 +2,18 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from module.auth.basic_auth.models import Customer
 from module.post.models import Post
 from module.post.helper.sr import PostSr, ChangePostSr, AddPostSr
-from module.post.helper.util import SlugUtil
-from module.post.custom_permisson import CustomPermission
-from module.auth.basic_auth.models import Customer
+from module.post.helper.slug_util import SlugUtil
 from module.post.custom_pagination import CustomPageNumberPagination
+from public.utils.permission_util import PermissionUtil
 from public.utils.pagination_util import PaginationUtil
 from public.utils.response_util import ResponseUtil
 
 
 class PostView(viewsets.GenericViewSet):
-    permission_classes = [CustomPermission]
+    permission_classes = (PermissionUtil,)
     queryset = Post.objects.all().order_by("id")
 
     def list(self, request):

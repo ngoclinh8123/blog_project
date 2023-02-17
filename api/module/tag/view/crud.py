@@ -4,12 +4,12 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from module.tag.models import Tag
 from module.tag.helper.sr import TagSr, AddTagSr, ChangeTagSr
-from module.tag.custom_permission import CustomPermission
 from public.utils.response_util import ResponseUtil
+from public.utils.permission_util import PermissionUtil
 
 
 class TagView(viewsets.GenericViewSet):
-    permission_classes = (CustomPermission,)
+    permission_classes = (PermissionUtil,)
     queryset = Tag.objects.all()
 
     def list(self, request):

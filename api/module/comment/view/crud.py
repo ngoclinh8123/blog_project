@@ -3,16 +3,16 @@ from django.utils.translation import gettext
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from module.comment.models import Comment
-from module.comment.custom_permission import CustomPermission
 from module.comment.helper.sr import CommentSr, ChangeCommentSr, AddCommentSr
 from module.auth.basic_auth.models import Customer
-from public.utils.response_util import ResponseUtil
 from public.utils.nest_util import NestUtil
+from public.utils.response_util import ResponseUtil
+from public.utils.permission_util import PermissionUtil
 
 
 class CommentView(viewsets.GenericViewSet):
     queryset = Comment.objects.all()
-    permission_classes = (CustomPermission,)
+    permission_classes = (PermissionUtil,)
 
     def retrieve(self, request, pk=None):
         # get all comments of post

@@ -1,6 +1,6 @@
 from django.db import models
 
-from module.public.models import BaseModel
+from public.models.base_model import BaseModel
 from module.auth.basic_auth.models import Customer
 from module.post.models import Post
 
