@@ -8,7 +8,7 @@ from module.post.custom_pagination import CustomPageNumberPagination, CustomPagi
 from module.post.helper.util import SlugUtil
 from module.post.custom_permisson import CustomPermission
 from module.auth.basic_auth.models import Customer
-from module.public.models import CustomResponse
+from public.utils.response_util import ResponseUtil
 
 
 class PostView(viewsets.GenericViewSet):
@@ -24,13 +24,13 @@ class PostView(viewsets.GenericViewSet):
             "pagination": CustomPagination.has_pagination(self, request, self.queryset.count()),
         }
         message = gettext("Retrieved posts successfully.")
-        return CustomResponse.success_response(self, message, result)
+        return ResponseUtil.success_response(self, message, result)
 
     def retrieve(self, request, pk=None):
         post = get_object_or_404(self.queryset, pk=pk)
         serializer = PostSr(post)
         message = gettext("Retrieved post successfully.")
-        return CustomResponse.success_response(self, message, serializer.data)
+        return ResponseUtil.success_response(self, message, serializer.data)
 
     @action(detail=False, methods=["post"])
     def add(self, request):
@@ -48,9 +48,9 @@ class PostView(viewsets.GenericViewSet):
         if serializer.is_valid():
             serializer.save()
             message = gettext("Created post successfully.")
-            return CustomResponse.success_response(self, message)
+            return ResponseUtil.success_response(self, message)
         message = gettext("Failed to create post.")
-        return CustomResponse.fail_response(self, message)
+        return ResponseUtil.fail_response(self, message)
 
     @action(detail=True, methods=["put"])
     def change(self, request, pk=None):
@@ -61,13 +61,13 @@ class PostView(viewsets.GenericViewSet):
         if serializer.is_valid():
             serializer.save()
             message = gettext("Updated post successfully.")
-            return CustomResponse.success_response(self, message)
+            return ResponseUtil.success_response(self, message)
         message = gettext("Failed to update post.")
-        return CustomResponse.fail_response(self, message)
+        return ResponseUtil.fail_response(self, message)
 
     @action(detail=True, methods=["delete"])
     def delete(self, request, pk=None):
         post = get_object_or_404(self.queryset, pk=pk)
         post.delete()
         message = gettext("Deleted post successfully.")
-        return CustomResponse.success_response(self, message)
+        return ResponseUtil.success_response(self, message)

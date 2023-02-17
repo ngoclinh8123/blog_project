@@ -6,7 +6,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from module.auth.basic_auth.helper.sr import ChangePasswordSr
 from module.auth.basic_auth.helper.token_util import TokenUtil
-from module.public.models import CustomResponse
+from public.utils.response_util import ResponseUtil
 
 User = get_user_model()
 
@@ -33,11 +33,11 @@ class Login(APIView):
 
             # Return a success response with the token
             message = gettext("Login successfully.")
-            return CustomResponse.success_response(self, message, token_access["access"])
+            return ResponseUtil.success_response(self, message, token_access["access"])
 
         # If the authentication fails, return an error response
         message = gettext("Account does not exist.")
-        return CustomResponse.fail_response(self, message)
+        return ResponseUtil.fail_response(self, message)
 
 
 class TokenRefresh(APIView):
@@ -61,7 +61,7 @@ class TokenRefresh(APIView):
         )
         # return success response
         message = gettext("Refresh token successfully.")
-        return CustomResponse.success_response(self, message, token)
+        return ResponseUtil.success_response(self, message, token)
 
 
 class ChangePassword(generics.UpdateAPIView):
@@ -75,7 +75,7 @@ class ChangePassword(generics.UpdateAPIView):
             # if old password is wrong return response
             if not user.check_password(serializer.data.get("old_password")):
                 message = gettext("Wrong password.")
-                return CustomResponse.success_response(self, message)
+                return ResponseUtil.success_response(self, message)
 
             # else set new password for user
             user.set_password(serializer.data.get("new_password"))
@@ -83,11 +83,11 @@ class ChangePassword(generics.UpdateAPIView):
 
             # if set new password success return success response
             message = gettext("Changed password successfully.")
-            return CustomResponse.success_response(self, message)
+            return ResponseUtil.success_response(self, message)
 
         # else return error response
         message = gettext("Changed password failed.")
-        return CustomResponse.fail_response(self, message)
+        return ResponseUtil.fail_response(self, message)
 
 
 class Logout(APIView):
@@ -101,4 +101,4 @@ class Logout(APIView):
         message = gettext("Logout successfully.")
 
         # return success response
-        return CustomResponse.success_response(self, message)
+        return ResponseUtil.success_response(self, message)
