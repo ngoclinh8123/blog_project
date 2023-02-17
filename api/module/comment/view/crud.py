@@ -7,7 +7,7 @@ from module.comment.custom_permission import CustomPermission
 from module.comment.helper.sr import CommentSr, ChangeCommentSr, AddCommentSr
 from module.auth.basic_auth.models import Customer
 from public.utils.response_util import ResponseUtil
-from module.public.nest_util import NestUtil
+from public.utils.nest_util import NestUtil
 
 
 class CommentView(viewsets.GenericViewSet):
@@ -35,7 +35,7 @@ class CommentView(viewsets.GenericViewSet):
         return ResponseUtil.fail_response(self, message)
 
     @action(methods=["PUT"], detail=True)
-    def change(self, request, pk=None):
+    def change(self, request, pk):
         obj = get_object_or_404(Comment, pk=pk)
         serializer = ChangeCommentSr(obj, request.data)
         if serializer.is_valid():

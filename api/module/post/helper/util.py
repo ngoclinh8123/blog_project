@@ -4,8 +4,7 @@ from module.post.models import Post
 
 
 class SlugUtil:
-    @staticmethod
-    def convert_text(text):
+    def convert_text(self, text):
         search = [
             "àáạảãâầấậẩẫăằắặẳẵ",
             "èéẹẻẽêềếệểễ",
@@ -42,13 +41,12 @@ class SlugUtil:
             text = re.sub(f"[{search_re}]", replace_re, text)
         return text.lower()
 
-    @staticmethod
-    def convert_separate(string):
+    def convert_separate(self, string):
         return "-".join(re.findall(r"\w+", string))
 
     def create_slug(self, length, title):
-        title = self.convert_text(title[:length])
-        slug = self.convert_separate(title)
+        new_title = self.convert_text(title[:length])
+        slug = self.convert_separate(new_title)
         while Post.objects.filter(slug=slug).exists():
             slug = f"{slug}{random.randrange(0, 1000)}"
         return slug

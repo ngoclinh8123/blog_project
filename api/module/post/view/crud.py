@@ -4,10 +4,11 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from module.post.models import Post
 from module.post.helper.sr import PostSr, ChangePostSr, AddPostSr
-from module.post.custom_pagination import CustomPageNumberPagination, CustomPagination
 from module.post.helper.util import SlugUtil
 from module.post.custom_permisson import CustomPermission
 from module.auth.basic_auth.models import Customer
+from module.post.custom_pagination import CustomPageNumberPagination
+from public.utils.pagination_util import PaginationUtil
 from public.utils.response_util import ResponseUtil
 
 
@@ -21,7 +22,9 @@ class PostView(viewsets.GenericViewSet):
         serializer = PostSr(posts, many=True)
         result = {
             "items": serializer.data,
-            "pagination": CustomPagination.has_pagination(self, request, self.queryset.count()),
+            "pagination": PaginationUtil.has_pagination(
+                self, request, self.queryset.count(), CustomPageNumberPagination.page_size
+            ),
         }
         message = gettext("Retrieved posts successfully.")
         return ResponseUtil.success_response(self, message, result)
@@ -39,7 +42,7 @@ class PostView(viewsets.GenericViewSet):
         data.update(
             {
                 # create slug from title and length = 100
-                "slug": SlugUtil.create_slug(self, 100, data["title"]),
+                "slug": SlugUtil().create_slug(100, data["title"]),
                 "customer": customer.id,
                 "mod": 1,
             }
@@ -53,10 +56,10 @@ class PostView(viewsets.GenericViewSet):
         return ResponseUtil.fail_response(self, message)
 
     @action(detail=True, methods=["put"])
-    def change(self, request, pk=None):
+    def change(self, request, pk):
         post = get_object_or_404(self.queryset, pk=pk)
         data = request.data.copy()
-        data["slug"] = SlugUtil.create_slug(self, 100, data["title"])
+        data["slug"] = SlugUtil().create_slug(100, data["title"])
         serializer = ChangePostSr(post, data=data)
         if serializer.is_valid():
             serializer.save()
