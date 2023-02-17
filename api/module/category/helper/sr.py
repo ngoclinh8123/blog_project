@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from module.category.models import Category, Post_Category
+from module.category.models import Category
 
 
 class CategorySr(serializers.ModelSerializer):
@@ -12,10 +12,10 @@ class CategorySr(serializers.ModelSerializer):
 class AddCategorySr(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ("title", "parent_id")
+        fields = ("title", "parent_id", "posts")
 
 
-class PostCategorySr(serializers.ModelSerializer):
+class ChangeCategorySr(serializers.ModelSerializer):
     class Meta:
-        model = Post_Category
-        fields = "__all__"
+        model = Category
+        fields = ("title", "parent_id", "posts")

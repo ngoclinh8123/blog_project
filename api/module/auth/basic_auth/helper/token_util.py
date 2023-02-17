@@ -13,11 +13,3 @@ class TokenUtil:
     @staticmethod
     def get_signature_from_token(token):
         return token.split(".")[-1]
-
-
-class RequestUtil:
-    @staticmethod
-    def get_request_data(request):
-        request_data = request.body.decode("utf-8")
-        data = ast.literal_eval(request_data)
-        return data

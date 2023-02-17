@@ -5,7 +5,7 @@ from rest_framework import permissions
 from rest_framework import generics
 from rest_framework.views import APIView
 from module.auth.basic_auth.helper.sr import ChangePasswordSr
-from module.auth.basic_auth.helper.util import TokenUtil, RequestUtil
+from module.auth.basic_auth.helper.token_util import TokenUtil
 from module.public.models import CustomResponse
 
 User = get_user_model()
@@ -16,7 +16,7 @@ class Login(APIView):
 
     def post(self, request):
         # Extract the request data
-        data_request = RequestUtil.get_request_data(request)
+        data_request = request.data
         username = data_request["username"]
         password = data_request["password"]
 
@@ -45,7 +45,7 @@ class TokenRefresh(APIView):
 
     def post(self, request):
         # get refresh token from request
-        refresh_token = RequestUtil.get_request_data(request)
+        refresh_token = request.data
 
         # get old token signature
         old_token_signature = TokenUtil.get_signature_from_token(refresh_token["refresh"])

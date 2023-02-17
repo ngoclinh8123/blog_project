@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from module.tag.models import Tag, Tag_Post
+from module.tag.models import Tag
 
 
 class TagSr(serializers.ModelSerializer):
@@ -12,16 +12,10 @@ class TagSr(serializers.ModelSerializer):
 class AddTagSr(serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ("title",)
+        fields = ("title", "posts")
 
 
-class TagPostSr(serializers.ModelSerializer):
+class ChangeTagSr(serializers.ModelSerializer):
     class Meta:
-        model = Tag_Post
-        fields = "__all__"
-
-
-class AddTagPostSr(serializers.ModelSerializer):
-    class Meta:
-        model = Tag_Post
-        fields = ("tag", "post")
+        model = Tag
+        fields = ("title", "posts")

@@ -7,7 +7,7 @@ from module.comment.custom_permission import CustomPermission
 from module.comment.helper.sr import CommentSr, ChangeCommentSr, AddCommentSr
 from module.auth.basic_auth.models import Customer
 from module.public.models import CustomResponse
-from module.public.util import Nest
+from module.public.nest_util import NestUtil
 
 
 class CommentView(viewsets.GenericViewSet):
@@ -18,7 +18,7 @@ class CommentView(viewsets.GenericViewSet):
         # get all comments of post
         comments = Comment.objects.filter(post=pk)
         serializer = CommentSr(comments, many=True)
-        data = Nest.nest_create(self, serializer.data)
+        data = NestUtil.nest_create(self, serializer.data)
         message = gettext("Retrieved comment successfully.")
         return CustomResponse.success_response(self, message, data)
 
@@ -47,7 +47,7 @@ class CommentView(viewsets.GenericViewSet):
 
     @action(methods=["delete"], detail=True)
     def delete(self, request, pk=None):
-        if Nest.nest_delete(self, Comment, pk):
+        if NestUtil.nest_delete(self, Comment, pk):
             message = gettext("Deleted comment successfully.")
             return CustomResponse.success_response(self, message)
         message = gettext("Deleted comment failed.")

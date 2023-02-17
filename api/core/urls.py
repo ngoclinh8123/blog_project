@@ -17,10 +17,10 @@ from django.contrib import admin
 from django.urls import path, include
 
 
-from module.post.route import routerPost
-from module.comment.route import routerComment
-from module.category.route import routerCategory
-from module.tag.route import routerTag
+from module.post.urls import routerPost
+from module.comment.urls import routerComment
+from module.category.urls import routerCategory
+from module.tag.urls import routerTag
 
 # from apps.auth import basic_auth
 

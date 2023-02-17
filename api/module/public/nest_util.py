@@ -1,4 +1,4 @@
-class Nest:
+class NestUtil:
     def nest_delete(self, model, pk):
         obj = model.objects.get(pk=pk)
         childs = list(model.objects.filter(parent_id=pk))
