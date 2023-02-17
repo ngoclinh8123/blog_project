@@ -13,10 +13,10 @@ from module.public.models import CustomResponse
 
 class PostView(viewsets.GenericViewSet):
     permission_classes = [CustomPermission]
-    queryset = Post.objects.filter(status=1).order_by("id")
+    queryset = Post.objects.all().order_by("id")
 
     def list(self, request):
-        # Get paginated posts with status=1
+        # Get paginated posts
         posts = CustomPageNumberPagination().paginate_queryset(self.queryset, request, view=self)
         serializer = PostSr(posts, many=True)
         result = {
