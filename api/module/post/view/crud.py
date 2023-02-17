@@ -58,6 +58,10 @@ class PostView(viewsets.GenericViewSet):
     @action(detail=True, methods=["put"])
     def change(self, request, pk):
         post = get_object_or_404(self.queryset, pk=pk)
+
+        # check if user is author or staff
+        self.check_object_permissions(request, post)
+
         data = request.data.copy()
         data["slug"] = SlugUtil().create_slug(100, data["title"])
         serializer = ChangePostSr(post, data=data)
@@ -71,6 +75,10 @@ class PostView(viewsets.GenericViewSet):
     @action(detail=True, methods=["delete"])
     def delete(self, request, pk=None):
         post = get_object_or_404(self.queryset, pk=pk)
+
+        # check if user is author or staff
+        self.check_object_permissions(request, post)
+
         post.delete()
         message = gettext("Deleted post successfully.")
         return ResponseUtil.success_response(self, message)

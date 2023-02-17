@@ -37,8 +37,12 @@ class CommentView(viewsets.GenericViewSet):
 
     @action(methods=["PUT"], detail=True)
     def change(self, request, pk):
-        obj = get_object_or_404(Comment, pk=pk)
-        serializer = ChangeCommentSr(obj, request.data)
+        comment = get_object_or_404(Comment, pk=pk)
+
+        # check if user is author or staff
+        self.check_object_permissions(request, comment)
+
+        serializer = ChangeCommentSr(comment, request.data)
         if serializer.is_valid():
             serializer.save()
             message = gettext("Updated comment successfully.")
@@ -48,6 +52,11 @@ class CommentView(viewsets.GenericViewSet):
 
     @action(methods=["delete"], detail=True)
     def delete(self, request, pk=None):
+        comment = get_object_or_404(Comment, pk=pk)
+
+        # check if user is author or staff
+        self.check_object_permissions(request, comment)
+
         if NestUtil.nest_delete(self, Comment, pk):
             message = gettext("Deleted comment successfully.")
             return ResponseUtil.success_response(self, message)

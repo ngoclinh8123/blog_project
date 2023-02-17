@@ -1,7 +1,4 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import permissions
-
-from module.post.models import Post
 
 
 class PermissionUtil(permissions.BasePermission):
@@ -34,3 +31,12 @@ class PermissionUtil(permissions.BasePermission):
         if request.user.groups.filter(permissions__codename=permission).count():
             is_allow = True
         return is_allow
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_staff is True:
+            return True
+
+        if request.user == obj.customer.user:
+            return True
+
+        return False
