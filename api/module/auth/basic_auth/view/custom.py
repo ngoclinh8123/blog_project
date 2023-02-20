@@ -33,11 +33,11 @@ class Login(APIView):
 
             # Return a success response with the token
             message = gettext("Login successfully.")
-            return ResponseUtil.success_response(self, message, token_access["access"])
+            return ResponseUtil.success_response(message, token_access["access"])
 
         # If the authentication fails, return an error response
         message = gettext("Account does not exist.")
-        return ResponseUtil.fail_response(self, message)
+        return ResponseUtil.fail_response(message)
 
 
 class TokenRefresh(APIView):
@@ -61,7 +61,7 @@ class TokenRefresh(APIView):
         )
         # return success response
         message = gettext("Refresh token successfully.")
-        return ResponseUtil.success_response(self, message, token)
+        return ResponseUtil.success_response(message, token)
 
 
 class ChangePassword(generics.UpdateAPIView):
@@ -75,7 +75,7 @@ class ChangePassword(generics.UpdateAPIView):
             # if old password is wrong return response
             if not user.check_password(serializer.data.get("old_password")):
                 message = gettext("Wrong password.")
-                return ResponseUtil.success_response(self, message)
+                return ResponseUtil.success_response(message)
 
             # else set new password for user
             user.set_password(serializer.data.get("new_password"))
@@ -83,11 +83,11 @@ class ChangePassword(generics.UpdateAPIView):
 
             # if set new password success return success response
             message = gettext("Changed password successfully.")
-            return ResponseUtil.success_response(self, message)
+            return ResponseUtil.success_response(message)
 
         # else return error response
         message = gettext("Changed password failed.")
-        return ResponseUtil.fail_response(self, message)
+        return ResponseUtil.fail_response(message)
 
 
 class Logout(APIView):
@@ -101,4 +101,4 @@ class Logout(APIView):
         message = gettext("Logout successfully.")
 
         # return success response
-        return ResponseUtil.success_response(self, message)
+        return ResponseUtil.success_response(message)

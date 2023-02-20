@@ -18,7 +18,7 @@ class CategoryView(viewsets.GenericViewSet):
         serializer = CategorySr(categories, many=True)
         data = NestUtil.nest_create(self, serializer.data)
         message = gettext("Retrieved categories successfully.")
-        return ResponseUtil.success_response(self, message, data)
+        return ResponseUtil.success_response(message, data)
 
     @action(methods=["post"], detail=False)
     def add(self, request):
@@ -28,11 +28,11 @@ class CategoryView(viewsets.GenericViewSet):
 
             # return success response
             message = gettext("Added category successfully.")
-            return ResponseUtil.success_response(self, message)
+            return ResponseUtil.success_response(message)
 
         # else return error response
         message = gettext("Added category failed.")
-        return ResponseUtil.fail_response(self, message)
+        return ResponseUtil.fail_response(message)
 
     @action(methods=["put"], detail=True)
     def change(self, request, pk):
@@ -41,14 +41,14 @@ class CategoryView(viewsets.GenericViewSet):
         if serializer.is_valid():
             serializer.save()
             message = gettext("Updated category successfully.")
-            return ResponseUtil.success_response(self, message)
+            return ResponseUtil.success_response(message)
         message = gettext("Updated category failed.")
-        return ResponseUtil.fail_response(self, message)
+        return ResponseUtil.fail_response(message)
 
     @action(methods=["delete"], detail=True)
     def delete(self, request, pk=None):
         if NestUtil.nest_delete(self, Category, pk):
             message = gettext("Deleted category successfully.")
-            return ResponseUtil.success_response(self, message)
+            return ResponseUtil.success_response(message)
         message = gettext("Deleted category failed.")
-        return ResponseUtil.fail_response(self, message)
+        return ResponseUtil.fail_response(message)

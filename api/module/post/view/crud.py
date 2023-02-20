@@ -23,17 +23,17 @@ class PostView(viewsets.GenericViewSet):
         result = {
             "items": serializer.data,
             "pagination": PaginationUtil.has_pagination(
-                self, request, self.queryset.count(), CustomPageNumberPagination.page_size
+                request, self.queryset.count(), CustomPageNumberPagination.page_size
             ),
         }
         message = gettext("Retrieved posts successfully.")
-        return ResponseUtil.success_response(self, message, result)
+        return ResponseUtil.success_response(message, result)
 
     def retrieve(self, request, pk=None):
         post = get_object_or_404(self.queryset, pk=pk)
         serializer = PostSr(post)
         message = gettext("Retrieved post successfully.")
-        return ResponseUtil.success_response(self, message, serializer.data)
+        return ResponseUtil.success_response(message, serializer.data)
 
     @action(detail=False, methods=["post"])
     def add(self, request):
@@ -51,9 +51,9 @@ class PostView(viewsets.GenericViewSet):
         if serializer.is_valid():
             serializer.save()
             message = gettext("Created post successfully.")
-            return ResponseUtil.success_response(self, message)
+            return ResponseUtil.success_response(message)
         message = gettext("Failed to create post.")
-        return ResponseUtil.fail_response(self, message)
+        return ResponseUtil.fail_response(message)
 
     @action(detail=True, methods=["put"])
     def change(self, request, pk):
@@ -68,9 +68,9 @@ class PostView(viewsets.GenericViewSet):
         if serializer.is_valid():
             serializer.save()
             message = gettext("Updated post successfully.")
-            return ResponseUtil.success_response(self, message)
+            return ResponseUtil.success_response(message)
         message = gettext("Failed to update post.")
-        return ResponseUtil.fail_response(self, message)
+        return ResponseUtil.fail_response(message)
 
     @action(detail=True, methods=["delete"])
     def delete(self, request, pk=None):
@@ -81,4 +81,4 @@ class PostView(viewsets.GenericViewSet):
 
         post.delete()
         message = gettext("Deleted post successfully.")
-        return ResponseUtil.success_response(self, message)
+        return ResponseUtil.success_response(message)

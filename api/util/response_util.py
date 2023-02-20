@@ -3,7 +3,8 @@ from rest_framework import status
 
 
 class ResponseUtil:
-    def success_response(self, message="", data=None, status=200):
+    @staticmethod
+    def success_response(message="", data=None, status=200):
         response_data = {
             "success": True,
             "message": message,
@@ -11,7 +12,8 @@ class ResponseUtil:
         }
         return Response(response_data, status=status)
 
-    def fail_response(self, message="", data=None, status=400):
+    @staticmethod
+    def fail_response(message="", data=None, status=400):
         response_data = {
             "success": False,
             "message": message,

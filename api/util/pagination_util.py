@@ -2,7 +2,8 @@ import math
 
 
 class PaginationUtil:
-    def has_pagination(self, request, totalItem, page_size):
+    @staticmethod
+    def has_pagination(request, totalItem, page_size):
         currentPage = int(request.GET.get("page", 1))
         host = request.META.get("HTTP_HOST")
         path = request.META.get("PATH_INFO")
@@ -29,11 +30,12 @@ class PaginationUtil:
 
             paginations["extra"] = {}
         else:
-            paginations = self.no_pagination()
+            paginations = PaginationUtil.no_pagination()
 
         return paginations
 
-    def no_pagination(self):
+    @staticmethod
+    def no_pagination():
         paginations = {}
         paginations["page_size"] = 0
         paginations["total_page"] = 0

@@ -20,7 +20,7 @@ class CommentView(viewsets.GenericViewSet):
         serializer = CommentSr(comments, many=True)
         data = NestUtil.nest_create(self, serializer.data)
         message = gettext("Retrieved comment successfully.")
-        return ResponseUtil.success_response(self, message, data)
+        return ResponseUtil.success_response(message, data)
 
     @action(methods=["POST"], detail=False)
     def add(self, request):
@@ -30,9 +30,9 @@ class CommentView(viewsets.GenericViewSet):
         if serializer.is_valid():
             serializer.save()
             message = gettext("Added comment successfully.")
-            return ResponseUtil.success_response(self, message)
+            return ResponseUtil.success_response(message)
         message = gettext("Added comment failed.")
-        return ResponseUtil.fail_response(self, message)
+        return ResponseUtil.fail_response(message)
 
     @action(methods=["PUT"], detail=True)
     def change(self, request, pk):
@@ -45,9 +45,9 @@ class CommentView(viewsets.GenericViewSet):
         if serializer.is_valid():
             serializer.save()
             message = gettext("Updated comment successfully.")
-            return ResponseUtil.success_response(self, message)
+            return ResponseUtil.success_response(message)
         message = gettext("Updated comment failed.")
-        return ResponseUtil.fail_response(self, message)
+        return ResponseUtil.fail_response(message)
 
     @action(methods=["delete"], detail=True)
     def delete(self, request, pk=None):
@@ -58,6 +58,6 @@ class CommentView(viewsets.GenericViewSet):
 
         if NestUtil.nest_delete(self, Comment, pk):
             message = gettext("Deleted comment successfully.")
-            return ResponseUtil.success_response(self, message)
+            return ResponseUtil.success_response(message)
         message = gettext("Deleted comment failed.")
-        return ResponseUtil.fail_response(self, message)
+        return ResponseUtil.fail_response(message)
