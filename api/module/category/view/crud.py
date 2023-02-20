@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from module.category.models import Category
 from module.category.helper.sr import CategorySr, AddCategorySr, ChangeCategorySr
-from util.nest_util import NestUtil
+from util.tree_data_processor_util import TreeDataProcessor
 from util.response_util import ResponseUtil
 from util.permission_util import PermissionUtil
 
@@ -16,7 +16,7 @@ class CategoryView(viewsets.GenericViewSet):
     def list(self, request):
         categories = Category.objects.all()
         serializer = CategorySr(categories, many=True)
-        data = NestUtil.nest_create(self, serializer.data)
+        data = TreeDataProcessor.create_tree_data(serializer.data)
         message = gettext("Retrieved categories successfully.")
         return ResponseUtil.success_response(message, data)
 
@@ -47,7 +47,7 @@ class CategoryView(viewsets.GenericViewSet):
 
     @action(methods=["delete"], detail=True)
     def delete(self, request, pk=None):
-        if NestUtil.nest_delete(self, Category, pk):
+        if TreeDataProcessor.delete_tree_data(Category, pk):
             message = gettext("Deleted category successfully.")
             return ResponseUtil.success_response(message)
         message = gettext("Deleted category failed.")

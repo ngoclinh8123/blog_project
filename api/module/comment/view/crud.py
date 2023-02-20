@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from module.comment.models import Comment
 from module.comment.helper.sr import CommentSr, ChangeCommentSr, AddCommentSr
 from module.auth.basic_auth.models import Customer
-from util.nest_util import NestUtil
+from util.tree_data_processor_util import TreeDataProcessor
 from util.response_util import ResponseUtil
 from util.permission_util import PermissionUtil
 
@@ -18,7 +18,7 @@ class CommentView(viewsets.GenericViewSet):
         # get all comments of post id = pk
         comments = Comment.objects.filter(post=pk)
         serializer = CommentSr(comments, many=True)
-        data = NestUtil.nest_create(self, serializer.data)
+        data = TreeDataProcessor.create_tree_data(serializer.data)
         message = gettext("Retrieved comment successfully.")
         return ResponseUtil.success_response(message, data)
 
@@ -56,7 +56,7 @@ class CommentView(viewsets.GenericViewSet):
         # check if user is author or staff
         self.check_object_permissions(request, comment)
 
-        if NestUtil.nest_delete(self, Comment, pk):
+        if TreeDataProcessor.delete_tree_data(Comment, pk):
             message = gettext("Deleted comment successfully.")
             return ResponseUtil.success_response(message)
         message = gettext("Deleted comment failed.")
