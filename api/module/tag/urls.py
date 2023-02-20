@@ -1,6 +1,8 @@
-from rest_framework import routers
-from module.tag.view.crud import TagView
+from django.urls import path
+from module.category.view.crud import CategoryView
 
-routerTag = routers.SimpleRouter()
-routerTag.register("api", TagView, basename="post")
-urlpatterns = routerTag.urls
+BASE_ENDPOINT = CategoryView.as_view({"get": "list", "post": "add"})
+
+PK_ENDPOINT = CategoryView.as_view({"put": "change", "delete": "delete"})
+
+urlpatterns = [path("api/", BASE_ENDPOINT), path("api/<int:pk>", PK_ENDPOINT)]

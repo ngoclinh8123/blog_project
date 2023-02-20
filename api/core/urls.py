@@ -17,19 +17,11 @@ from django.contrib import admin
 from django.urls import path, include
 
 
-from module.post.urls import routerPost
-from module.comment.urls import routerComment
-from module.category.urls import routerCategory
-from module.tag.urls import routerTag
-
-# from apps.auth import basic_auth
-
-
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("tags/", include(routerTag.urls)),
-    path("posts/", include(routerPost.urls)),
-    path("comments/", include(routerComment.urls)),
-    path("categories/", include(routerCategory.urls)),
+    path("tags/", include("module.tag.urls")),
+    path("posts/", include("module.post.urls")),
+    path("comments/", include("module.comment.urls")),
+    path("categories/", include("module.category.urls")),
     path("auth/", include("module.auth.basic_auth.url")),
 ]

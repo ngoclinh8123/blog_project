@@ -1,6 +1,8 @@
-from rest_framework import routers
+from django.urls import path
 from module.comment.view.crud import CommentView
 
-routerComment = routers.SimpleRouter()
-routerComment.register("api", CommentView, basename="comment")
-urlpatterns = routerComment.urls
+BASE_ENDPOINT = CommentView.as_view({"post": "add"})
+
+PK_ENDPOINT = CommentView.as_view({"get": "list", "put": "change", "delete": "delete"})
+
+urlpatterns = [path("api/", BASE_ENDPOINT), path("api/<int:pk>", PK_ENDPOINT)]

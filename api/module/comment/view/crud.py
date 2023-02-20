@@ -14,7 +14,7 @@ class CommentView(viewsets.GenericViewSet):
     queryset = Comment.objects.all()
     permission_classes = (PermissionUtil,)
 
-    def retrieve(self, request, pk=None):
+    def list(self, request, pk=None):
         # get all comments of post id = pk
         comments = Comment.objects.filter(post=pk)
         serializer = CommentSr(comments, many=True)
