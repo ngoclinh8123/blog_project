@@ -15,9 +15,8 @@ class CommentView(viewsets.GenericViewSet):
     permission_classes = (PermissionUtil,)
 
     def retrieve(self, request, pk=None):
-        # get all comments of post
+        # get all comments of post id = pk
         comments = Comment.objects.filter(post=pk)
-        print(comments)
         serializer = CommentSr(comments, many=True)
         data = NestUtil.nest_create(self, serializer.data)
         message = gettext("Retrieved comment successfully.")

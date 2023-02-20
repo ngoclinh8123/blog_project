@@ -14,7 +14,7 @@ class PermissionUtil(permissions.BasePermission):
             "change": ["PUT", "PATCH"],
         }
 
-        # cho quyen xem
+        # allow user only read api
         if action in alias["view"]:
             return True
 
@@ -36,6 +36,7 @@ class PermissionUtil(permissions.BasePermission):
         if request.user.is_staff is True:
             return True
 
+        # check if user is author
         if request.user == obj.customer.user:
             return True
 
