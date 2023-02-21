@@ -31,13 +31,13 @@ class CategoryTests(APITestCase):
         category = Category.objects.get(id=self.category1.id)
         self.assertEqual(str(category), f"{category.id} - {category.title} - {category.parent_id}")
 
-    def test_retrieve_category(self):
+    def test_retrieve_view_category(self):
         url = reverse("category_detail", args=[self.category1.id])
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["data"]["title"], "Parent category")
 
-    def test_list_categories(self):
+    def test_list_view_categories(self):
         url = reverse("category_list")
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -85,9 +85,9 @@ class CategoryTests(APITestCase):
 
     def test_delete_category(self):
         url = reverse("category_detail", args=[self.category1.id])
-        response = self.client.delete(url)
 
         # case token not provided
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, 401)
 
         # case user is non superuser
@@ -97,6 +97,7 @@ class CategoryTests(APITestCase):
 
         # case user is superuser
         self.client.force_authenticate(user=self.superuser)
+        print(Category.objects.all().count())
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Category.objects.all().count(), 0)
