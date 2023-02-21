@@ -20,6 +20,12 @@ class CategoryView(viewsets.GenericViewSet):
         message = gettext("Retrieved categories successfully.")
         return ResponseUtil.success_response(message, data)
 
+    def retrieve(self, request, pk=None):
+        category = get_object_or_404(Category, pk=pk)
+        serializer = CategorySr(category)
+        message = gettext("Retrieved category successfully.")
+        return ResponseUtil.success_response(message, serializer.data)
+
     @action(methods=["post"], detail=False)
     def add(self, request):
         serializer = AddCategorySr(data=request.data)
