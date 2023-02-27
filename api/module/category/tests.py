@@ -2,8 +2,8 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework.authtoken.models import Token
 from module.category.models import Category
+from util.test_user_account_util import TestUserAccountUtil
 
 
 class CategoryTests(APITestCase):
@@ -16,16 +16,10 @@ class CategoryTests(APITestCase):
         User = get_user_model()
 
         # create non superuser
-        self.user = User.objects.create(username="test", password="123", email="test@example.com")
+        self.user = TestUserAccountUtil.create_user()
 
         # create superuser
-        self.superuser = User.objects.create(
-            username="test2",
-            password="123",
-            email="test2@example.com",
-            is_staff=True,
-            is_superuser=True,
-        )
+        self.superuser = TestUserAccountUtil.create_super_user()
 
     def test_category_string_representation(self):
         category = Category.objects.get(id=self.category1.id)
@@ -97,7 +91,6 @@ class CategoryTests(APITestCase):
 
         # case user is superuser
         self.client.force_authenticate(user=self.superuser)
-        print(Category.objects.all().count())
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Category.objects.all().count(), 0)

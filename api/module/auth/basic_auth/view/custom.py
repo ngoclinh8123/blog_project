@@ -1,12 +1,18 @@
+import os
+from decouple import config
+from django.core.mail import send_mail
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login, get_user_model, authenticate
 from django.utils.translation import gettext
+from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import generics
 from rest_framework.views import APIView
-from module.auth.basic_auth.helper.sr import ChangePasswordSr
+from module.auth.basic_auth.helper.sr import ChangePasswordSr, ResetPasswordSerializer
 from module.auth.basic_auth.helper.token_util import TokenUtil
 from util.response_util import ResponseUtil
+
 
 User = get_user_model()
 
@@ -102,3 +108,66 @@ class Logout(APIView):
 
         # return success response
         return ResponseUtil.success_response(message)
+
+
+class ForgotPassword(APIView):
+    permission_classes = [
+        permissions.AllowAny,
+    ]
+
+    def post(self, request):
+        try:
+            email = request.data["email"]
+        except:
+            message = gettext("Please enter your email address .")
+            return ResponseUtil.fail_response(message)
+
+        # get user from email
+        user = get_object_or_404(User, email=email)
+
+        # create token for user
+        token = TokenUtil.get_tokens_for_user(user)
+        new_token_signature = TokenUtil.get_signature_from_token(token["access"])
+
+        # update new token signature for user
+        User.objects.filter(email=email).update(token_signature=new_token_signature)
+
+        # create link to reset password form
+        scheme = request.scheme
+        # domain run port in frontend
+        domain = config("DOMAIN_FRONTEND")
+        # path to reset password form in frontend
+        path = "reset-password"
+        link = f"{scheme}://{domain}/{path}?token={token['access']}"
+
+        subject = "Password Reset Request for Your Account"
+        message = f"To reset your password, please click on the following link: {link}"
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [
+            email,
+        ]
+        try:
+            send_mail(subject, message, email_from, recipient_list, fail_silently=False)
+            message = gettext("Email sent successfully .")
+            return ResponseUtil.success_response(message)
+        except:
+            message = gettext("Email sent failed .")
+            return ResponseUtil.fail_response(message)
+
+
+class ResetPassword(APIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    def post(self, request):
+        serializer = ResetPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            user.set_password(serializer.data.get("new_password"))
+            user.save()
+            message = gettext("Reset password successfully.")
+            return ResponseUtil.success_response(message)
+        else:
+            message = gettext("Reset password failed.")
+            return ResponseUtil.fail_response(message)

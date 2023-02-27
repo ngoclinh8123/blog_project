@@ -28,9 +28,13 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
-CORS_ALLOWED_ORIGINS = []
+# CORS_ALLOWED_ORIGINS = [
+#     "http://127.0.0.1:5173",
+# ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Application definition
@@ -50,6 +54,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    "rest_framework.authtoken",
+    "django_rest_passwordreset",
 ]
 
 REST_FRAMEWORK = {
@@ -192,3 +198,11 @@ LANGUAGES = [
 LOCALE_PATHS = [
     # os.path.join(BASE_DIR, 'locale'),
 ]
+
+# send email reset password
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")

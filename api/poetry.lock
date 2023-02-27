@@ -52,6 +52,18 @@ files = [
 Django = ">=3.2"
 
 [[package]]
+name = "django-rest-passwordreset"
+version = "1.3.0"
+description = "An extension of django rest framework, providing a configurable password reset strategy"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-rest-passwordreset-1.3.0.tar.gz", hash = "sha256:0d76eb8d0be9636f4404fd35e8a0842c968effeac1d141c55a45aef1ebce54c7"},
+    {file = "django_rest_passwordreset-1.3.0-py3-none-any.whl", hash = "sha256:f888fcb589c46e2f86f9686751de4cc1350c519aa3b120b993b1d675fd96fad6"},
+]
+
+[[package]]
 name = "djangorestframework"
 version = "3.14.0"
 description = "Web APIs for Django, made easy."
@@ -280,4 +292,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "387163b2da75893ddd50e5988c40c33fda30eab434efc43c4e4268a4f2efe3d3"
+content-hash = "36ff08f9737d4ef8c8856293b8c31e6a785703ff40267161231792a0ca4d099a"
