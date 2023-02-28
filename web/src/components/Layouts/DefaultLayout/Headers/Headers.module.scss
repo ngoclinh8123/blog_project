@@ -1,0 +1,20 @@
+.header{
+    position: relative;
+}
+
+.btn{
+    color:white
+}
+
+.btn_logout{
+    color:white !important;
+    margin-left: auto;
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.icon_logout{
+    margin-left: 8px;
+}
