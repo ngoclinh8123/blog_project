@@ -27,6 +27,7 @@ services:
     tty: true
     ports:
       - "8000:8000"
+    command: poetry run gunicorn core.wsgi:application --bind 0.0.0.0:8000
     depends_on:
       - base_db
     
@@ -44,3 +45,15 @@ services:
         - "80:80"
     depends_on:
         - base_api
+  base_web:
+    container_name: base_web 
+    build:
+      context: ../web
+      dockerfile: ../docker/dockerfiles/web
+    volumes:
+      - ../web:/code:delegated
+      - /code/node_modules
+    ports:
+      - "5173:5173"
+    command: npm run dev
+    tty: true
