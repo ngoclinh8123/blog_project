@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import generics
 from rest_framework.views import APIView
-from module.auth.basic_auth.helper.sr import ChangePasswordSr, ResetPasswordSerializer
+from module.auth.basic_auth.helper.sr import ChangePasswordSr, ResetPasswordSr, UserInfoSr
 from module.auth.basic_auth.helper.token_util import TokenUtil
 from util.response_util import ResponseUtil
 
@@ -161,7 +161,7 @@ class ResetPassword(APIView):
     ]
 
     def post(self, request):
-        serializer = ResetPasswordSerializer(data=request.data)
+        serializer = ResetPasswordSr(data=request.data)
         if serializer.is_valid():
             user = request.user
             user.set_password(serializer.data.get("new_password"))
@@ -171,3 +171,22 @@ class ResetPassword(APIView):
         else:
             message = gettext("Reset password failed.")
             return ResponseUtil.fail_response(message)
+
+
+class UserView(APIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    def get(self, request):
+        # get authorization token from request header
+        token = request.META.get("HTTP_AUTHORIZATION", " ").split(" ")[1]
+        if token != "":
+            # find user and delete token signature
+            signature = token.split(".")[-1]
+            user = get_object_or_404(User, token_signature=signature)
+            serializer = UserInfoSr(user)
+            message = gettext("Get user successfully.")
+            return ResponseUtil.success_response(message, serializer.data)
+        message = gettext("Get user failed.")
+        return ResponseUtil.fail_response(message)

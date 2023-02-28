@@ -3,6 +3,8 @@ from django.utils.translation import gettext
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from module.category.models import Category
+from module.post.models import Post
+from module.post.helper.sr import PostSr
 from module.category.helper.sr import CategorySr, AddCategorySr, ChangeCategorySr
 from util.tree_data_processor_util import TreeDataProcessor
 from util.response_util import ResponseUtil
@@ -20,11 +22,12 @@ class CategoryView(viewsets.GenericViewSet):
         message = gettext("Retrieved categories successfully.")
         return ResponseUtil.success_response(message, data)
 
-    def retrieve(self, request, pk=None):
-        category = get_object_or_404(Category, pk=pk)
-        serializer = CategorySr(category)
-        message = gettext("Retrieved category successfully.")
-        return ResponseUtil.success_response(message, serializer.data)
+    def retrieve(self, request, pk):
+        if type(pk) == int and pk >= 0:
+            posts = Post.objects.filter(category__id=pk)
+            serializer = PostSr(posts, many=True)
+            message = gettext("Retrieved category successfully.")
+            return ResponseUtil.success_response(message, serializer.data)
 
     @action(methods=["post"], detail=False)
     def add(self, request):

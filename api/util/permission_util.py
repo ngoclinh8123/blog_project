@@ -18,12 +18,15 @@ class PermissionUtil(permissions.BasePermission):
         if action in alias["view"]:
             return True
 
-        main_action = view.basename
+        # main_action = view.basename
+        main_action = view.__class__.__module__.split(".")[1]
+
         for key, value in alias.items():
             if action in value:
                 action = key
 
         permission = f"{action}_{main_action}"
+        print(permission)
 
         is_allow = False
         if request.user.user_permissions.filter(codename=permission).count():

@@ -58,7 +58,6 @@ class PostView(viewsets.GenericViewSet):
     @action(detail=True, methods=["put"])
     def change(self, request, pk):
         post = get_object_or_404(self.queryset, pk=pk)
-
         # check if user is author or staff
         self.check_object_permissions(request, post)
 

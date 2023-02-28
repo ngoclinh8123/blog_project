@@ -10,6 +10,12 @@ class ChangePasswordSr(serializers.Serializer):
     new_password = serializers.CharField(required=True)
 
 
-class ResetPasswordSerializer(serializers.Serializer):
+class ResetPasswordSr(serializers.Serializer):
     model = User
     new_password = serializers.CharField(required=True)
+
+
+class UserInfoSr(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["username", "first_name", "last_name", "email", "date_joined"]

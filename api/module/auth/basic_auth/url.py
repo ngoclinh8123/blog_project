@@ -7,6 +7,7 @@ from module.auth.basic_auth.view.custom import (
     ChangePassword,
     ForgotPassword,
     ResetPassword,
+    UserView,
 )
 
 
@@ -17,4 +18,5 @@ urlpatterns = [
     path("password/change/", ChangePassword.as_view()),
     path("forgot_password/", ForgotPassword.as_view()),
     path("reset_password/", ResetPassword.as_view()),
+    path("user_info/", UserView.as_view()),
 ]
