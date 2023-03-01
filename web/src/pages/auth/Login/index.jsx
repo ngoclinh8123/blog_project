@@ -9,7 +9,7 @@ function Login(){
 
     const navigate = useNavigate()
 
-    const onFinish = (values) => {
+    function onFinish(values){
         axios.post(`${import.meta.env.VITE_URL_API}/auth/token/`,{username:values.username,password:values.password})
             .then(response =>{
                 const cookie = new Cookies()
@@ -22,7 +22,7 @@ function Login(){
             })
     };
 
-    const onFinishFailed = (errorInfo) => {
+    function onFinishFailed(errorInfo){
         console.log('Failed:', errorInfo);
     };
     return (

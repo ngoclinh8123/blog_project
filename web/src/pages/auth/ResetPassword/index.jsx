@@ -7,7 +7,7 @@ function ResetPassword(){
 
     const navigate = useNavigate()
 
-    const onFinish = (values) => {
+    function onFinish(values){
         const url = `${import.meta.env.VITE_URL_API}/auth/reset_password/`
         const new_password=values["password"]
         const urlParams = new URLSearchParams(window.location.search);
@@ -20,7 +20,7 @@ function ResetPassword(){
             message.error("Reset password failed")
         }
     };
-    const onFinishFailed = (errorInfo) => {
+    function onFinishFailed(errorInfo){
         console.log('Failed:', errorInfo);
     };
     return (

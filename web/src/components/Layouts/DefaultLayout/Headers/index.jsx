@@ -10,19 +10,16 @@ const cookie = new Cookies()
 const text = 'Are you sure to logout?';
 const description = 'Logout';
 
-const confirm = () => {
-  message.info('Clicked on Yes.');
-};
 
 function Headers(){
     const navigate=useNavigate()
     const token= cookie.get('token')
 
-    const handleClickLogin=()=>{
+    function handleClickLogin(){
         navigate("/login")
     }
 
-    const handleClickLogout=()=>{
+    function handleClickLogout(){
         cookie.remove('token')
         navigate("/login")
     }

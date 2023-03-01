@@ -27,7 +27,7 @@ function ForgotPassword(){
       };
       /* eslint-enable no-template-curly-in-string */
       
-      const onFinish = (values) => {
+      function onFinish(values){
         const url=`${import.meta.env.VITE_URL_API}/auth/forgot_password/`
         const email=values["user"]["email"]
         if(email==="" || email === undefined) {

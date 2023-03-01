@@ -42,7 +42,7 @@ function Siders(){
     })
   }
 
-  const onOpenChange = (keys) => {
+  function onOpenChange(keys){
     const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
     if (rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
       setOpenKeys(keys);
