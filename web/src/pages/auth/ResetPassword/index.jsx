@@ -8,7 +8,7 @@ function ResetPassword(){
     const navigate = useNavigate()
 
     const onFinish = (values) => {
-        const url = "http://127.0.0.1:8000/auth/reset_password/"
+        const url = `${import.meta.env.VITE_URL_API}/auth/reset_password/`
         const new_password=values["password"]
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');

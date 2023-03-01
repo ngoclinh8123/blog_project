@@ -10,7 +10,7 @@ function Login(){
     const navigate = useNavigate()
 
     const onFinish = (values) => {
-        axios.post('http://127.0.0.1:8000/auth/token/',{username:values.username,password:values.password})
+        axios.post(`${import.meta.env.VITE_URL_API}/auth/token/`,{username:values.username,password:values.password})
             .then(response =>{
                 const cookie = new Cookies()
                 cookie.set('token',response.data.data,{path:'/',maxAge:3600})

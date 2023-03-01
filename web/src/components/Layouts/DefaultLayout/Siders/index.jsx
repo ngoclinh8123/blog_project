@@ -15,7 +15,7 @@ function Siders(){
   const navigate=useNavigate()
 
   useEffect(()=>{
-    const url ="http://127.0.0.1:8000/categories/api"
+    const url =`${import.meta.env.VITE_URL_API}/categories/api`
     get_data(url)
       .then(response=>{
         setCategories(response.data["data"])

@@ -9,9 +9,8 @@ function Category(){
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('pk');
         
-        
     useEffect(() => {
-        const url= `http://127.0.0.1:8000/categories/api/${id}`
+        const url= `${import.meta.env.VITE_URL_API}/categories/api/${id}`
         get_data(url)
             .then(response=>{
                 setPosts(response.data["data"])

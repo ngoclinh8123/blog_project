@@ -28,7 +28,7 @@ function ForgotPassword(){
       /* eslint-enable no-template-curly-in-string */
       
       const onFinish = (values) => {
-        const url="http://127.0.0.0:8000/auth/forgot_password/"
+        const url=`${import.meta.env.VITE_URL_API}/auth/forgot_password/`
         const email=values["user"]["email"]
         if(email==="" || email === undefined) {
           message.warning("Please enter your email")

@@ -8,7 +8,7 @@ function Profile(){
     const token=cookie.get('token')
     const [user,setUser]=useState({})
     useEffect(()=>{
-        get_data("http://127.0.0.1:8000/auth/user_info/",token)
+        get_data(`${import.meta.env.VITE_URL_API}/auth/user_info/`,token)
             .then(response=>{
                 if(response){
                     setUser(response.data['data'])
