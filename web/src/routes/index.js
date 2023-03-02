@@ -1,16 +1,18 @@
+import { lazy } from "react";
+
 // layout
 import { DefaultLayout } from "../components/layouts";
 import Auth from "../components/layouts/auth";
 
 // pages
-import Home from "../pages/home";
-import Profile from "../pages/profile";
-import Category from "../pages/category";
-import Blog from "../pages/blog";
-import Login from "../pages/auth/login";
-import ResetPassword from "../pages/auth/reset_password";
-import ForgotPassword from "../pages/auth/forgot_password";
-import SendMailResult from "../pages/auth/send_mail_result";
+const Home = lazy(() => import("../pages/home"));
+const Profile = lazy(() => import("../pages/profile"));
+const Category = lazy(() => import("../pages/category"));
+const Blog = lazy(() => import("../pages/blog"));
+const Login = lazy(() => import("../pages/auth/login"));
+const ResetPassword = lazy(() => import("../pages/auth/reset_password"));
+const ForgotPassword = lazy(() => import("../pages/auth/forgot_password"));
+const SendMailResult = lazy(() => import("../pages/auth/send_mail_result"));
 
 // routes
 const publicRoutes = [

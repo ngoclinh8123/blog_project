@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { publicRoutes } from "./routes";
@@ -24,7 +24,9 @@ function App() {
                 path={route.path}
                 element={
                   <Layout>
-                    <Page />
+                    <Suspense fallback={<div>Loading...</div>}>
+                      <Page />
+                    </Suspense>
                   </Layout>
                 }
               />
