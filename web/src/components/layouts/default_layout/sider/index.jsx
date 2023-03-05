@@ -14,12 +14,14 @@ function MySider() {
   const [openKeys, setOpenKeys] = useState(["/"]);
   const [refresh, setRefresh] = useState(false);
 
+  // Use an effect hook to fetch the user information from the API when the refresh flag changes
   useEffect(() => {
     api.get("/categories/api").then((response) => {
       setCategories(response.data.data);
     });
   }, [refresh]);
 
+  // Use an effect hook to set the onTokenRefreshed callback to update the refresh flag
   useEffect(() => {
     setOnTokenRefreshed(() => {
       setRefresh(true);
