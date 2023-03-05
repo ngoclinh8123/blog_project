@@ -1,10 +1,10 @@
 import Cookies from 'universal-cookie'
 import axios from 'axios'
 
-// const cookie= new Cookies()
-// const token=cookie.get('token')
+const cookie= new Cookies()
+const token=cookie.get('token')
 
-function get_data(url, token = "") {
+function get_data(url,token="") {
     let headers;
     if (token === "" || token===undefined) {
       headers = {

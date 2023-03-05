@@ -1,21 +1,23 @@
 import axios from "axios";
-import Cookies from "universal-cookie";
+import Cookies from 'universal-cookie';
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Form, Input, message } from "antd";
+import api from "../../../service/axios/api"
 import styles from "./login.module.scss";
+
 
 function Login() {
   const navigate = useNavigate();
+  const cookies = new Cookies();
 
   function onFinish(values) {
-    axios
-      .post(`${import.meta.env.VITE_URL_API}/auth/token/`, {
+    api
+      .post("/auth/token/", {
         username: values.username,
         password: values.password,
       })
       .then((response) => {
-        const cookie = new Cookies();
-        cookie.set("token", response.data.data, { path: "/", maxAge: 3600 });
+        cookies.set('token', response.data.data, { path: '/',maxAge:36000 });
         message.success("Login success");
         navigate("/");
       })

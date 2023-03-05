@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Layout, Menu } from "antd";
 import { UserOutlined, AppstoreOutlined } from "@ant-design/icons";
-import { get_data } from "../../../../api";
+import api, { setOnTokenRefreshed } from "../../../../service/axios/api";
 import styles from "./sider.module.scss";
 
 const SubMenu = Menu.SubMenu;
@@ -12,13 +12,19 @@ const rootSubmenuKeys = ["/", "/profile", "1"];
 function MySider() {
   const [categories, setCategories] = useState([]);
   const [openKeys, setOpenKeys] = useState(["/"]);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
-    const url = `${import.meta.env.VITE_URL_API}/categories/api`;
-    get_data(url).then((response) => {
-      setCategories(response.data["data"]);
+    api.get("/categories/api").then((response) => {
+      setCategories(response.data.data);
     });
-  }, []);
+  }, [refresh]);
+
+  useEffect(() => {
+    setOnTokenRefreshed(() => {
+      setRefresh(true);
+    });
+  });
 
   function render_category_item(categories) {
     return categories.map((category) => {

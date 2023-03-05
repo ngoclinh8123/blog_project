@@ -13,6 +13,7 @@ const description = "Logout";
 function MyHeader() {
   const navigate = useNavigate();
   const token = cookie.get("token");
+  // console.log(token)
 
   function handleClickLogin() {
     navigate("/login");
