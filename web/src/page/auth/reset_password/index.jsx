@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styles from "./reset_password.module.css";
 
-function ResetPassword() {
+function resetPassword() {
   const navigate = useNavigate();
 
   function onFinish(values) {
@@ -108,4 +108,4 @@ function ResetPassword() {
   );
 }
 
-export default ResetPassword;
+export default resetPassword;

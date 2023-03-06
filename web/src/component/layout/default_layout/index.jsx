@@ -1,18 +1,18 @@
 import "./default_layout.module.css";
 import { Layout } from "antd";
-import MyHeader from "./header";
-import MySider from "./sider";
-import MyContent from "./content";
+import myHeader from "./header";
+import mySider from "./sider";
+import myContent from "./content";
 
-function DefaultLayout({ children }) {
+function defaultLayout({ children }) {
   return (
     <div className="container">
       <Layout>
-        <MyHeader />
+        <myHeader />
         <Layout>
-          <MySider />
+          <mySider />
           <Layout style={{ padding: "0 24px 24px" }}>
-            <MyContent>{children}</MyContent>
+            <myContent>{children}</myContent>
           </Layout>
         </Layout>
       </Layout>
@@ -20,4 +20,4 @@ function DefaultLayout({ children }) {
   );
 }
 
-export default DefaultLayout;
+export default defaultLayout;

@@ -2,7 +2,7 @@ import { Fragment, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { publicRoutes } from "./route";
-import { DefaultLayout } from "./component/layout";
+import defaultLayout from "./component/layout/default_layout";
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
         <Routes>
           {publicRoutes.map((route, index) => {
             const Page = route.page;
-            let Layout = DefaultLayout;
+            let Layout = defaultLayout;
             if (route.layout) {
               Layout = route.layout;
             } else if (route.layout === null) {

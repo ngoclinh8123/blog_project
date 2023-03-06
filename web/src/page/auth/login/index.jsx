@@ -4,7 +4,7 @@ import { Button, Form, Input, message } from "antd";
 import api from "../../../service/axios/api";
 import styles from "./login.module.css";
 
-function Login() {
+function login() {
   const navigate = useNavigate();
   const cookies = new Cookies();
 
@@ -92,4 +92,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default login;

@@ -10,10 +10,9 @@ const cookie = new Cookies();
 const text = "Are you sure to logout?";
 const description = "Logout";
 
-function MyHeader() {
+function myHeader() {
   const navigate = useNavigate();
   const token = cookie.get("token");
-  // console.log(token)
 
   function handleClickLogin() {
     navigate("/login");
@@ -55,4 +54,4 @@ function MyHeader() {
   );
 }
 
-export default MyHeader;
+export default myHeader;

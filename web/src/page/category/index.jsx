@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import api, { setOnTokenRefreshed } from "../../service/axios/api";
 import styles from "./category.module.css";
 
-function Category() {
+function category() {
   const [posts, setPosts] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const location = useLocation();
@@ -43,4 +43,4 @@ function Category() {
   );
 }
 
-export default Category;
+export default category;

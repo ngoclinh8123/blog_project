@@ -9,7 +9,7 @@ const SubMenu = Menu.SubMenu;
 const { Sider } = Layout;
 const rootSubmenuKeys = ["/", "/profile", "1"];
 
-function MySider() {
+function mySider() {
   const [categories, setCategories] = useState([]);
   const [openKeys, setOpenKeys] = useState(["/"]);
   const [refresh, setRefresh] = useState(false);
@@ -72,4 +72,4 @@ function MySider() {
   );
 }
 
-export default MySider;
+export default mySider;

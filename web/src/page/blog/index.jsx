@@ -3,7 +3,7 @@ import styles from "./blog.module.css";
 
 const cx = classNames.bind(styles);
 
-function Blog() {
+function blog() {
   return (
     <div>
       <h1 className={cx("title")}>blog page</h1>
@@ -11,4 +11,4 @@ function Blog() {
   );
 }
 
-export default Blog;
+export default blog;
