@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button, Form, Input, message } from "antd";
-import { post_data_no_token } from "../../../api";
-import api from "../../../service/axios/api"
+import api from "../../../service/axios/api";
 import styles from "./forgot_password.module.scss";
 
 function ForgotPassword() {
@@ -32,15 +31,15 @@ function ForgotPassword() {
     if (email === "" || email === undefined) {
       message.warning("Please enter your email");
     } else {
-        api
-          .post('/auth/forgot_password/',{email:email})
-          .then(response=>{
-            console.log('send email success')
-            navigate("/forgot-password/result");
-          })
-          .catch(e=>{
-            message.error("Send email failed");
-          })
+      api
+        .post("/auth/forgot_password/", { email: email })
+        .then((response) => {
+          console.log("send email success");
+          navigate("/forgot-password/result");
+        })
+        .catch((e) => {
+          message.error("Send email failed");
+        });
     }
   }
   return (

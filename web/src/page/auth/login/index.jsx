@@ -1,10 +1,8 @@
-import axios from "axios";
-import Cookies from 'universal-cookie';
+import Cookies from "universal-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Form, Input, message } from "antd";
-import api from "../../../service/axios/api"
+import api from "../../../service/axios/api";
 import styles from "./login.module.scss";
-
 
 function Login() {
   const navigate = useNavigate();
@@ -17,7 +15,7 @@ function Login() {
         password: values.password,
       })
       .then((response) => {
-        cookies.set('token', response.data.data, { path: '/',maxAge:36000 });
+        cookies.set("token", response.data.data, { path: "/", maxAge: 36000 });
         message.success("Login success");
         navigate("/");
       })
