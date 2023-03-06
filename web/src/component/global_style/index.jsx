@@ -1,7 +1,7 @@
 import "./global_style.module.css";
 
-function globalStyle({ children }) {
+function GlobalStyle({ children }) {
   return children;
 }
 
-export default globalStyle;
+export default GlobalStyle;

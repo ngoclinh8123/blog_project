@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import styles from "./profile.module.css";
 
-function profile() {
+function Profile() {
   const [user, setUser] = useState({});
   const [refresh, setRefresh] = useState(false);
 
@@ -51,4 +51,4 @@ function profile() {
   );
 }
 
-export default profile;
+export default Profile;

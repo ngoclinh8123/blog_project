@@ -3,7 +3,7 @@ import { Button, Form, Input, message } from "antd";
 import api from "/src/service/axios/api";
 import styles from "./forgot_password.module.css";
 
-function forgotPassword() {
+function ForgotPassword() {
   const navigate = useNavigate();
 
   const layout = {
@@ -85,4 +85,4 @@ function forgotPassword() {
   );
 }
 
-export default forgotPassword;
+export default ForgotPassword;

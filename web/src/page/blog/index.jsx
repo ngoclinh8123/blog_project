@@ -1,6 +1,6 @@
 import styles from "./blog.module.css";
 
-function blog() {
+function Blog() {
   return (
     <div>
       <h1 className={cx("title")}>blog page</h1>
@@ -8,4 +8,4 @@ function blog() {
   );
 }
 
-export default blog;
+export default Blog;

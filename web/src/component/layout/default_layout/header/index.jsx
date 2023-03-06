@@ -9,7 +9,7 @@ const cookie = new Cookies();
 const text = "Are you sure to logout?";
 const description = "Logout";
 
-function myHeader() {
+function MyHeader() {
   const navigate = useNavigate();
   const token = cookie.get("token");
 
@@ -53,4 +53,4 @@ function myHeader() {
   );
 }
 
-export default myHeader;
+export default MyHeader;

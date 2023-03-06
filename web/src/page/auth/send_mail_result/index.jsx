@@ -1,6 +1,6 @@
 import { Result } from "antd";
 
-function sendMailResult() {
+function SendMailResult() {
   return (
     <Result
       status="success"
@@ -11,4 +11,4 @@ function sendMailResult() {
   );
 }
 
-export default sendMailResult;
+export default SendMailResult;
