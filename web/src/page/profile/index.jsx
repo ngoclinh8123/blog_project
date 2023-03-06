@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import styles from "./profile.module.scss";
 import api, { setOnTokenRefreshed } from "../../service/axios/api";
+import styles from "./profile.module.css";
 
 function Profile() {
   const [user, setUser] = useState({});

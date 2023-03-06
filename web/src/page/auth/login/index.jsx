@@ -2,7 +2,7 @@ import Cookies from "universal-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Form, Input, message } from "antd";
 import api from "../../../service/axios/api";
-import styles from "./login.module.scss";
+import styles from "./login.module.css";
 
 function Login() {
   const navigate = useNavigate();

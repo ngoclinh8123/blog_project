@@ -1,5 +1,5 @@
 import { Layout } from "antd";
-import "./content.module.scss";
+import "./content.module.css";
 const { Content } = Layout;
 
 function MyContent({ children }) {

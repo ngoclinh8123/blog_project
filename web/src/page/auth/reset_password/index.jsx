@@ -1,7 +1,7 @@
 import { Button, Form, Input, message } from "antd";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios'
-import styles from "./reset_password.module.scss";
+import axios from "axios";
+import styles from "./reset_password.module.css";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -10,22 +10,26 @@ function ResetPassword() {
     const url = `${import.meta.env.VITE_URL_API}/auth/reset_password/`;
     const new_password = values["password"];
 
-    // get token from url 
+    // get token from url
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
     axios
-      .post(url,{ new_password: new_password },{
-          headers: {Authorization: `JWT ${token}`
-      }})
-      .then(response=>{
+      .post(
+        url,
+        { new_password: new_password },
+        {
+          headers: { Authorization: `JWT ${token}` },
+        }
+      )
+      .then((response) => {
         message.success("Reset password successfully");
         navigate("/login");
       })
-      .catch(e=>{
+      .catch((e) => {
         message.error("Reset password failed");
-      })
+      });
   }
-  
+
   function onFinishFailed(errorInfo) {
     console.log("Failed:", errorInfo);
   }

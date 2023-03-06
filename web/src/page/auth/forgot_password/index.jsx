@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button, Form, Input, message } from "antd";
 import api from "../../../service/axios/api";
-import styles from "./forgot_password.module.scss";
+import styles from "./forgot_password.module.css";
 
 function ForgotPassword() {
   const navigate = useNavigate();

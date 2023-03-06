@@ -1,4 +1,4 @@
-import "./default_layout.module.scss";
+import "./default_layout.module.css";
 import { Layout } from "antd";
 import MyHeader from "./header";
 import MySider from "./sider";

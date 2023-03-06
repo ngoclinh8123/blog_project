@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import styles from "./category.module.scss";
 import api, { setOnTokenRefreshed } from "../../service/axios/api";
+import styles from "./category.module.css";
 
 function Category() {
   const [posts, setPosts] = useState([]);

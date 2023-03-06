@@ -3,7 +3,7 @@ import { Layout } from "antd";
 import { useNavigate } from "react-router-dom";
 import { LogoutOutlined, LoginOutlined } from "@ant-design/icons";
 import { Button, Popconfirm } from "antd";
-import styles from "./header.module.scss";
+import styles from "./header.module.css";
 
 const { Header } = Layout;
 const cookie = new Cookies();

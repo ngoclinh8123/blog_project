@@ -1,4 +1,4 @@
-import styles from "./auth.module.scss";
+import styles from "./auth.module.css";
 
 function Auth({ children }) {
   return <div className={styles.container}>{children}</div>;
