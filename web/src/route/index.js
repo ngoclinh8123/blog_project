@@ -1,18 +1,18 @@
 import { lazy } from "react";
 
 // layout
-import { DefaultLayout } from "../components/layouts";
-import Auth from "../components/layouts/auth";
+import { DefaultLayout } from "../component/layout";
+import Auth from "../component/layout/auth";
 
 // pages
-const Home = lazy(() => import("../pages/home"));
-const Profile = lazy(() => import("../pages/profile"));
-const Category = lazy(() => import("../pages/category"));
-const Blog = lazy(() => import("../pages/blog"));
-const Login = lazy(() => import("../pages/auth/login"));
-const ResetPassword = lazy(() => import("../pages/auth/reset_password"));
-const ForgotPassword = lazy(() => import("../pages/auth/forgot_password"));
-const SendMailResult = lazy(() => import("../pages/auth/send_mail_result"));
+const Home = lazy(() => import("../page/home"));
+const Profile = lazy(() => import("../page/profile"));
+const Category = lazy(() => import("../page/category"));
+const Blog = lazy(() => import("../page/blog"));
+const Login = lazy(() => import("../page/auth/login"));
+const ResetPassword = lazy(() => import("../page/auth/reset_password"));
+const ForgotPassword = lazy(() => import("../page/auth/forgot_password"));
+const SendMailResult = lazy(() => import("../page/auth/send_mail_result"));
 
 // routes
 const publicRoutes = [
