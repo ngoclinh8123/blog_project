@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import api, { setOnTokenRefreshed } from "../../service/axios/api";
+import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import styles from "./category.module.css";
 
 function category() {

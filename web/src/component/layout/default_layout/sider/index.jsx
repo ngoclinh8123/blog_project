@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Layout, Menu } from "antd";
 import { UserOutlined, AppstoreOutlined } from "@ant-design/icons";
-import api, { setOnTokenRefreshed } from "../../../../service/axios/api";
+import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import styles from "./sider.module.css";
 
 const SubMenu = Menu.SubMenu;

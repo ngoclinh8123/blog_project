@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api, { setOnTokenRefreshed } from "../../service/axios/api";
+import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import styles from "./profile.module.css";
 
 function profile() {

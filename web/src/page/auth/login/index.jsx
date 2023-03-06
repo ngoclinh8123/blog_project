@@ -1,7 +1,7 @@
 import Cookies from "universal-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Form, Input, message } from "antd";
-import api from "../../../service/axios/api";
+import api from "/src/service/axios/api";
 import styles from "./login.module.css";
 
 function login() {

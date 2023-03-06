@@ -1,8 +1,8 @@
-import "./default_layout.module.css";
 import { Layout } from "antd";
-import myHeader from "./header";
-import mySider from "./sider";
-import myContent from "./content";
+import myHeader from "/src/component/layout/default_layout/header";
+import mySider from "/src/component/layout/default_layout/sider";
+import myContent from "/src/component/layout/default_layout/content";
+import styles from "./default_layout.module.css";
 
 function defaultLayout({ children }) {
   return (

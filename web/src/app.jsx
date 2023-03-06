@@ -1,8 +1,8 @@
 import { Fragment, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { publicRoutes } from "./route";
-import defaultLayout from "./component/layout/default_layout";
+import { publicRoutes } from "/src/route";
+import defaultLayout from "/src/component/layout/default_layout";
 
 function App() {
   return (
