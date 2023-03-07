@@ -5,6 +5,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import login, get_user_model, authenticate
 from django.utils.translation import gettext
+from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import generics
@@ -37,9 +38,11 @@ class Login(APIView):
             # Update the user's token signature in the database
             User.objects.filter(username=username).update(token_signature=token_signature)
 
-            # Return a success response with the token
-            message = gettext("Login successfully.")
-            return ResponseUtil.success_response(message, token_access["access"])
+            # Create a response and set the token cookie as HTTP only
+            response = JsonResponse({"message": "Login successfully."})
+            response.set_cookie(key="token", value=token_access["access"], httponly=True)
+
+            return response
 
         # If the authentication fails, return an error response
         message = gettext("Account does not exist.")

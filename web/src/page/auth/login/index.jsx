@@ -9,13 +9,14 @@ function Login() {
   const cookies = new Cookies();
 
   function onFinish(values) {
+    // Cookie set ở response trả về API dạng HTTP only chứ ko được set ở client.
     api
       .post("/auth/token/", {
         username: values.username,
         password: values.password,
       })
       .then((response) => {
-        cookies.set("token", response.data.data, { path: "/", maxAge: 36000 });
+        console.log(response);
         message.success("Login success");
         navigate("/");
       })

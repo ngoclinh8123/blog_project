@@ -1,17 +1,22 @@
-// import fs from "fs";
-// import https from "https";
-import { defineConfig } from "vite";
+import fs from "fs";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    // https: {
-    //   key: fs.readFileSync(process.env.PATH_TO_KEY_FILE),
-    //   cert: fs.readFileSync(process.env.PATH_TO_CERT_FILE),
-    // },
-    host: "0.0.0.0",
-    // port: 5173,
-  },
-});
+const useHttps = process.env.VITE_ENABLE_HTTPS === "true";
+export default ({ mode }) => {
+  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
+
+  return defineConfig({
+    plugins: [react()],
+    server: {
+      host: "0.0.0.0",
+      https: useHttps
+        ? {
+            cert: fs.readFileSync(process.env.VITE_PATH_TO_CERT_FILE),
+            key: fs.readFileSync(process.env.VITE_PATH_TO_KEY_FILE),
+          }
+        : false,
+      port: process.env.VITE_PORT,
+    },
+  });
+};
