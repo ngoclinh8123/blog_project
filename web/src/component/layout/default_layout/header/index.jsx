@@ -1,31 +1,40 @@
-import Cookies from "universal-cookie";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout, Button, Popconfirm } from "antd";
 import { LogoutOutlined, LoginOutlined } from "@ant-design/icons";
+import { AuthContext } from "/src/util/context/auth_context";
+import api from "/src/service/axios/api";
 import styles from "./header.module.css";
 
 const { Header } = Layout;
-const cookie = new Cookies();
 const text = "Are you sure to logout?";
 const description = "Logout";
 
 function MyHeader() {
+  const { loggedIn, handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
-  const token = cookie.get("token");
 
   function handleClickLogin() {
     navigate("/login");
   }
 
   function handleClickLogout() {
-    cookie.remove("token");
-    navigate("/login");
+    api
+      .post("/auth/logout/")
+      .then((response) => {
+        // set status loggedIn to false
+        handleLogout();
+
+        // navigate to login page
+        navigate("/login");
+      })
+      .catch((error) => {});
   }
 
   return (
     <Header className={styles.header}>
       <div className="logo"></div>
-      {token ? (
+      {loggedIn ? (
         <Popconfirm
           placement="bottomRight"
           title={text}

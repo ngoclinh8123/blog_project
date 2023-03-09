@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import login, get_user_model, authenticate
 from django.utils.translation import gettext
 from django.http import JsonResponse
-from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -54,10 +53,10 @@ class TokenRefresh(APIView):
 
     def post(self, request):
         # get refresh token from request
-        refresh_token = request.data
+        refresh_token = request.COOKIES["token"]
 
         # get old token signature
-        old_token_signature = TokenUtil.get_signature_from_token(refresh_token["refresh"])
+        old_token_signature = TokenUtil.get_signature_from_token(refresh_token)
 
         # get user and new token signature for user
         user = get_object_or_404(User, token_signature=old_token_signature)
@@ -69,8 +68,9 @@ class TokenRefresh(APIView):
             token_signature=new_token_signature
         )
         # return success response
-        message = gettext("Refresh token successfully.")
-        return ResponseUtil.success_response(message, token)
+        response = JsonResponse({"message": "Refresh token successfully."})
+        response.set_cookie(key="token", value=token["access"], httponly=True)
+        return response
 
 
 class ChangePassword(generics.UpdateAPIView):
@@ -100,17 +100,21 @@ class ChangePassword(generics.UpdateAPIView):
 
 
 class Logout(APIView):
+    permission_classes = [
+        permissions.AllowAny,
+    ]
+
     def post(self, request):
         # get authorization token from request header
-        token = request.META.get("HTTP_AUTHORIZATION", " ").split(" ")[1]
+        token = request.COOKIES.get("token", "")
         if token != "":
             # find user and delete token signature
             signature = token.split(".")[-1]
             User.objects.filter(token_signature=signature).update(token_signature="")
         message = gettext("Logout successfully.")
-
-        # return success response
-        return ResponseUtil.success_response(message)
+        response = JsonResponse({"message": message})
+        response.delete_cookie("token")
+        return response
 
 
 class ForgotPassword(APIView):

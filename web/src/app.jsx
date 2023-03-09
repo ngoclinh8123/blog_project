@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { publicRoutes } from "/src/route";
 import defaultLayout from "/src/component/layout/default_layout";
+import axios from "axios";
 
 function App() {
   return (

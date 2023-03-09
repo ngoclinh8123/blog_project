@@ -1,23 +1,23 @@
-import Cookies from "universal-cookie";
+import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Form, Input, message } from "antd";
 import api from "/src/service/axios/api";
+import { AuthContext } from "/src/util/context/auth_context";
 import styles from "./login.module.css";
 
 function Login() {
+  const { handleLogin } = useContext(AuthContext);
   const navigate = useNavigate();
-  const cookies = new Cookies();
 
   function onFinish(values) {
-    // Cookie set ở response trả về API dạng HTTP only chứ ko được set ở client.
     api
       .post("/auth/token/", {
         username: values.username,
         password: values.password,
       })
       .then((response) => {
-        console.log(response);
         message.success("Login success");
+        handleLogin();
         navigate("/");
       })
       .catch((e) => {

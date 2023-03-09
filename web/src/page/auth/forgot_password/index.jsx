@@ -34,7 +34,6 @@ function ForgotPassword() {
       api
         .post("/auth/forgot_password/", { email: email })
         .then((response) => {
-          console.log("send email success");
           navigate("/forgot-password/result");
         })
         .catch((e) => {

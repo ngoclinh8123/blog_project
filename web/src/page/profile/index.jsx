@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
+import { AuthContext } from "/src/util/context/auth_context";
 import styles from "./profile.module.css";
 
 function Profile() {
   const [user, setUser] = useState({});
   const [refresh, setRefresh] = useState(false);
+  const { handleLogin } = useContext(AuthContext);
 
   // Use an effect hook to fetch the user information from the API when the refresh flag changes
   useEffect(() => {
@@ -13,6 +15,7 @@ function Profile() {
       .then((response) => {
         if (response) {
           setUser(response.data["data"]);
+          handleLogin();
         }
       })
       .catch((e) => {});
