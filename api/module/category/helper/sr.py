@@ -18,4 +18,4 @@ class AddCategorySr(serializers.ModelSerializer):
 class ChangeCategorySr(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ("title", "parent_id", "posts")
+        fields = ("posts",)

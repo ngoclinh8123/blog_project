@@ -64,7 +64,9 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+    ),
 }
 
 AUTH_USER_MODEL = "basic_auth.User"
@@ -82,7 +84,7 @@ MIDDLEWARE = [
     "service.framework.middleware.custom_middleware.RequiredCheckTokenSignature",
 ]
 
-CSRF_TRUSTED_ORIGINS = ["https://base.test"]
+CSRF_TRUSTED_ORIGINS = [config("CSRF_TRUSTED_ORIGINS")]
 
 ROOT_URLCONF = "core.urls"
 

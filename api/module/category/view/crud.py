@@ -48,9 +48,14 @@ class CategoryView(viewsets.GenericViewSet):
         obj = get_object_or_404(Category, pk=pk)
         serializer = ChangeCategorySr(obj, request.data)
         if serializer.is_valid():
-            serializer.save()
+            category=serializer.save()
+
+            # return posts of category after change
+            posts = Post.objects.filter(category__id=pk)
+            postsr = PostSr(posts, many=True)
+
             message = gettext("Updated category successfully.")
-            return ResponseUtil.success_response(message)
+            return ResponseUtil.success_response(message,postsr.data)
         message = gettext("Updated category failed.")
         return ResponseUtil.fail_response(message)
 

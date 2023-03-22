@@ -39,7 +39,7 @@ function MySider() {
       } else {
         return (
           <Menu.Item key={`/category/${category.id}`}>
-            <Link to={`/category?pk=${category.id}`}>{category.title}</Link>
+            <Link to={`/category/${category.id}`}>{category.title}</Link>
           </Menu.Item>
         );
       }
@@ -60,11 +60,10 @@ function MySider() {
       <Menu mode="inline" openKeys={openKeys} onOpenChange={onOpenChange}>
         <Menu.Item key="/profile">
           <Link to="/profile">
-            <UserOutlined />
             <span className={styles.category_item_title}>Profile</span>
           </Link>
         </Menu.Item>
-        <SubMenu key="category" title="Category" icon={<AppstoreOutlined />}>
+        <SubMenu key="category" title="Category">
           {render_category_item(categories)}
         </SubMenu>
       </Menu>

@@ -5,11 +5,11 @@ services:
     ports:
       - "5432:5432"
     environment:
-        POSTGRES_USER: ${DB_USERNAME}
-        POSTGRES_PASSWORD: ${DB_PASSWORD}
-        POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
-        - ./api/dbdata:/var/lib/postgresql/data/:delegated
+      - ./api/dbdata:/var/lib/postgresql/data/:delegated
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
@@ -30,7 +30,7 @@ services:
     command: poetry run gunicorn core.wsgi:application --bind 0.0.0.0:8000
     depends_on:
       - base_db
-    
+
   base_nginx:
     container_name: base_nginx
     build:
@@ -41,12 +41,12 @@ services:
       - ../api/public/:/resource/public
       - ${PATH_TO_SSL}:/resource/ssl
     ports:
-        - "443:443"
-        - "80:80"
+      - "443:443"
+      - "80:80"
     depends_on:
-        - base_api
+      - base_api
   base_web:
-    container_name: base_web 
+    container_name: base_web
     build:
       context: ../web
       dockerfile: ../docker/dockerfiles/web

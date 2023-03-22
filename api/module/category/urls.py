@@ -7,5 +7,5 @@ PK_ENDPOINT = CategoryView.as_view({"get": "retrieve", "put": "change", "delete"
 
 urlpatterns = [
     path("api/", BASE_ENDPOINT, name="category_list"),
-    path("api/<int:pk>", PK_ENDPOINT, name="category_detail"),
+    path("api/<int:pk>/", PK_ENDPOINT, name="category_detail"),
 ]

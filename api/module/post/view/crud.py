@@ -18,7 +18,9 @@ class PostView(viewsets.GenericViewSet):
 
     def list(self, request):
         # Get paginated posts
-        posts = CustomPageNumberPagination().paginate_queryset(self.queryset, request, view=self)
+        posts = CustomPageNumberPagination().paginate_queryset(
+            self.queryset, request, view=self
+        )
         serializer = PostSr(posts, many=True)
         result = {
             "items": serializer.data,
@@ -49,9 +51,9 @@ class PostView(viewsets.GenericViewSet):
         )
         serializer = AddPostSr(data=data)
         if serializer.is_valid():
-            serializer.save()
+            post=serializer.save()
             message = gettext("Created post successfully.")
-            return ResponseUtil.success_response(message)
+            return ResponseUtil.success_response(message,post.id)
         message = gettext("Failed to create post.")
         return ResponseUtil.fail_response(message)
 
