@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
-import { Button, Form, Input, InputNumber, message } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Button, Form, Input, message } from "antd";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
 import styles from "./category.module.css";
@@ -39,17 +39,20 @@ function Category() {
     },
   };
 
-  useEffect(() => {
+  function getPost() {
     api
       .get(`/categories/api/${id}`)
       .then((response) => {
         if (response) {
-          console.log(response);
           const postId = response.data.data;
           setPosts(response.data["data"]);
         }
       })
       .catch((e) => {});
+  }
+
+  useEffect(() => {
+    getPost();
   }, [location, refresh]);
 
   // Use an effect hook to set the onTokenRefreshed callback to update the refresh flag
@@ -79,7 +82,7 @@ function Category() {
     return arrPostId;
   }
 
-  const onFinish = (values) => {
+  const handleAddPost = (values) => {
     const title = values.post.title;
     const content = values.post.content;
 
@@ -106,6 +109,25 @@ function Category() {
       });
   };
 
+  function handleDeletePost(id) {
+    if (loggedIn) {
+      // call api to delete post here
+      api
+        .delete(`/posts/api/${id}`)
+        .then((response) => {
+          message.success("Delete post successfully");
+          getPost();
+        })
+        .catch((e) => {
+          if (e.response.status === 403) {
+            message.error("You have no permission to delete this post");
+          }
+        });
+    } else {
+      message.error("Please login to do this action");
+    }
+  }
+
   return (
     <div className={styles.container}>
       <button
@@ -124,7 +146,7 @@ function Category() {
         <Form
           {...layout}
           name="nest-messages"
-          onFinish={onFinish}
+          onFinish={handleAddPost}
           style={{
             maxWidth: 600,
           }}
@@ -162,9 +184,13 @@ function Category() {
       <ul className={styles.post_list}>
         {posts.map((post, index) => (
           <li key={index} className={styles.post_item}>
-            <Link to={`/blog/${post.id}`}>
+            <Link to={`/blog/${post.id}`} className={styles.post_item_link}>
               <p className={styles.item_title}>{post.title}</p>
             </Link>
+            <DeleteOutlined
+              className={styles.post_item_icon}
+              onClick={() => handleDeletePost(post.id)}
+            />
           </li>
         ))}
       </ul>

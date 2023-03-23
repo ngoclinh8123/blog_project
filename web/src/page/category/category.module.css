@@ -39,12 +39,27 @@
   margin: 6px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
+  position: relative;
 }
 
 .post_item:hover {
   background-color: #ddd;
 }
 
+.post_item_link {
+  background-color: red;
+}
+
 .post_item a {
   color: black;
+}
+
+.post_item_icon {
+  position: absolute;
+  right: 8px;
+  top: 40%;
+}
+
+.post_item_icon:hover {
+  color: red;
 }
