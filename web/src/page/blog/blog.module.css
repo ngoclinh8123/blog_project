@@ -1,9 +1,59 @@
+.container {
+  width: 90%;
+}
+
+.blog {
+}
+
+.btn_open_form {
+  margin-bottom: 24px;
+}
+
+.form {
+  margin: 24px 0;
+  padding: 24px;
+  border: 1px solid blue;
+  border-radius: 4px;
+}
+
+.btn_close_form {
+  margin-right: 12px;
+}
+
+.post_content {
+  text-align: justify;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 36px;
+}
+
 .title {
   font-size: 20px;
   font-weight: 600;
+  color: rgb(76, 1, 1);
 }
 
 .content {
   margin-top: 12px;
   font-size: 1.6rem;
+}
+
+.total_comment {
+  margin-top: 8px;
+}
+
+.comment_form_block {
+  margin: 12px 0 24px;
+}
+
+.comment_form {
+  /* position: relative; */
+}
+
+.item_add_comment {
+}
+
+.input_add_comment {
+}
+
+.btn_add_comment {
 }
