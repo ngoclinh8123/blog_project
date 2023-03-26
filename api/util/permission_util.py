@@ -26,9 +26,8 @@ class PermissionUtil(permissions.BasePermission):
                 action = key
 
         permission = f"{action}_{main_action}"
-        print(permission)
 
-        is_allow = False
+        is_allow = True
         if request.user.user_permissions.filter(codename=permission).count():
             is_allow = True
         if request.user.groups.filter(permissions__codename=permission).count():
@@ -42,5 +41,4 @@ class PermissionUtil(permissions.BasePermission):
         # check if user is author
         if request.user == obj.customer.user:
             return True
-
         return False

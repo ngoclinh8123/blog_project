@@ -1,6 +1,6 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input, message, Avatar } from "antd";
 import { EditOutlined, SendOutlined } from "@ant-design/icons";
 import { AuthContext } from "/src/util/context/auth_context";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
@@ -8,12 +8,14 @@ import styles from "./blog.module.css";
 
 function Blog() {
   const [blog, setBlog] = useState();
+  const [comments, setComments] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const { id } = useParams();
+  const formCommentRef = useRef(null);
 
   // use AuthContext to get status login
-  const { loggedIn, handleLogout } = useContext(AuthContext);
+  const { loggedIn, handleLogout, user } = useContext(AuthContext);
 
   // antdesign define
   const layout = {
@@ -66,6 +68,24 @@ function Blog() {
       .catch((e) => {});
   }
 
+  function getComments() {
+    api
+      .get(`/comments/api/${id}`)
+      .then((response) => {
+        setComments(response.data.data);
+      })
+      .catch((e) => {});
+  }
+
+  function handleDeleteComment(id) {
+    api
+      .delete(`/comments/api/${id}`)
+      .then((response) => {
+        getComments();
+      })
+      .catch((e) => {});
+  }
+
   function callUpdatePost(title, content) {
     api
       .put(`/posts/api/${id}`, { title: title, content: content })
@@ -89,12 +109,33 @@ function Blog() {
   };
 
   const handleAddComment = (values) => {
-    console.log(values);
+    const post = id;
+    const parent_id = 0;
+    const content = values.comment;
+    formCommentRef.current.resetFields();
+    if (loggedIn) {
+      api
+        .post(`/comments/api/`, {
+          parent_id: parent_id,
+          content: content,
+          post: post,
+        })
+        .then((response) => {
+          getComments();
+          message.success("Add comment successfully");
+        })
+        .catch((e) => {
+          message.error("Error while adding comment");
+        });
+    } else {
+      message.error("Please login to do this action");
+    }
   };
 
   // Use an effect hook to fetch the user information from the API when the refresh flag changes
   useEffect(() => {
     getPost();
+    getComments();
   }, [refresh]);
 
   // Use an effect hook to set the onTokenRefreshed callback to update the refresh flag
@@ -103,6 +144,8 @@ function Blog() {
       setRefresh(true);
     });
   }, []);
+
+  console.log(user);
 
   return (
     <div className={styles.container}>
@@ -139,10 +182,15 @@ function Blog() {
                     required: true,
                   },
                 ]}
+                initialValue={blog.title}
               >
                 <Input />
               </Form.Item>
-              <Form.Item name={["post", "content"]} label="Content">
+              <Form.Item
+                name={["post", "content"]}
+                label="Content"
+                initialValue={blog.content}
+              >
                 <Input.TextArea />
               </Form.Item>
               <Form.Item
@@ -174,10 +222,11 @@ function Blog() {
           <div className={styles.comment_block}>
             <div className={styles.total_comment}>
               <span>Comment</span>
-              <span>(7)</span>
+              <span>( {comments.length} )</span>
             </div>
             <div className={styles.comment_form_block}>
               <Form
+                ref={formCommentRef}
                 className={styles.comment_form}
                 {...layout}
                 name="nest-messages"
@@ -199,6 +248,7 @@ function Blog() {
                   <Input.TextArea
                     placeholder="Your comment..."
                     className={styles.input_add_comment}
+                    style={{ flexGrow: 1 }}
                   />
                 </Form.Item>
                 <Button
@@ -209,6 +259,77 @@ function Blog() {
                 ></Button>
               </Form>
             </div>
+
+            {comments.length > 0 &&
+              comments.map((comment, index) => (
+                <div className={styles.comment_item_wrap}>
+                  <div className={styles.comment_item}>
+                    <div className={styles.comment_item_avatar}>
+                      <Avatar
+                        style={{
+                          backgroundColor: "#f56a00",
+                          verticalAlign: "middle",
+                        }}
+                        size="medium"
+                      >
+                        {comment.customer.username[0]}
+                      </Avatar>
+                    </div>
+                    <div className={styles.comment_item_content_action}>
+                      <div className={styles.comment_item_content}>
+                        <div className={styles.comment_item_user}>
+                          {comment.customer.username}
+                        </div>
+                        <div className={styles.comment_item_title}>
+                          {comment.content}
+                        </div>
+                      </div>
+                      <div className={styles.comment_item_action}>
+                        {user.username === comment.customer.username && (
+                          <span onClick={() => handleDeleteComment(comment.id)}>
+                            Delete
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {comment.childs &&
+                    comment.childs.map((child, index) => (
+                      <div className={styles.comment_sub_item} key={index}>
+                        <div className={styles.comment_item_avatar}>
+                          <Avatar
+                            style={{
+                              backgroundColor: "#f56a00",
+                              verticalAlign: "middle",
+                            }}
+                            size="medium"
+                          >
+                            {child.customer.username[0]}
+                          </Avatar>
+                        </div>
+                        <div className={styles.comment_item_content_action}>
+                          <div className={styles.comment_item_content}>
+                            <div className={styles.comment_item_user}>
+                              {child.customer.username}
+                            </div>
+                            <div className={styles.comment_item_title}>
+                              {child.content}
+                            </div>
+                          </div>
+                          <div className={styles.comment_item_action}>
+                            {user.username === child.customer.username && (
+                              <span
+                                onClick={() => handleDeleteComment(child.id)}
+                              >
+                                Delete
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              ))}
           </div>
         </div>
       )}
@@ -217,3 +338,8 @@ function Blog() {
 }
 
 export default Blog;
+
+// {comment.childs &&
+//   comment.childs.map((child, index) => (
+
+//   ))}

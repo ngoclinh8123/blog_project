@@ -6,6 +6,7 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [user, setUser] = useState({});
 
   const handleLogin = () => {
     setLoggedIn(true);
@@ -13,6 +14,7 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogout = () => {
     setLoggedIn(false);
+    setUser({});
   };
 
   // Use an effect hook to fetch the user information from the API when the refresh flag changes
@@ -22,6 +24,7 @@ export const AuthProvider = ({ children }) => {
       .then((response) => {
         if (response) {
           handleLogin();
+          setUser(response.data.data);
         }
       })
       .catch((e) => {});
@@ -37,6 +40,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
+        user,
         loggedIn,
         handleLogin,
         handleLogout,

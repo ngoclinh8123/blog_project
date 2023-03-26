@@ -51,9 +51,9 @@ class PostView(viewsets.GenericViewSet):
         )
         serializer = AddPostSr(data=data)
         if serializer.is_valid():
-            post=serializer.save()
+            post = serializer.save()
             message = gettext("Created post successfully.")
-            return ResponseUtil.success_response(message,post.id)
+            return ResponseUtil.success_response(message, post.id)
         message = gettext("Failed to create post.")
         return ResponseUtil.fail_response(message)
 
