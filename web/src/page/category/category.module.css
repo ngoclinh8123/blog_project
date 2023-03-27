@@ -63,3 +63,22 @@
 .post_item_icon:hover {
   color: red;
 }
+
+.item_row {
+  border: 1px solid black;
+}
+
+.item_col_1 {
+  background-color: red;
+}
+
+.item_col_2 {
+  background-color: aqua;
+}
+
+.item_col_3 {
+  background-color: beige;
+}
+.item_col_4 {
+  background-color: burlywood;
+}

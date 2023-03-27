@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input, message, Row, Col } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
@@ -128,8 +128,25 @@ function Category() {
     }
   }
 
+  console.log(posts);
+
   return (
     <div className={styles.container}>
+      <Row justify="space-around" className={styles.item_row}>
+        <Col span={4} className={styles.item_col_1}>
+          col-4
+        </Col>
+        <Col span={4} className={styles.item_col_2}>
+          col-4
+        </Col>
+        <Col span={4} className={styles.item_col_3}>
+          col-4
+        </Col>
+        <Col span={4} className={styles.item_col_4}>
+          col-4
+        </Col>
+      </Row>
+
       <button
         onClick={openForm}
         className={styles.btn_open_form}

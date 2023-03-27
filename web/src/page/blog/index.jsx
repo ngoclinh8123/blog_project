@@ -145,8 +145,6 @@ function Blog() {
     });
   }, []);
 
-  console.log(user);
-
   return (
     <div className={styles.container}>
       {blog && (
