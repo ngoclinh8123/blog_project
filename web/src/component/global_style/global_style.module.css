@@ -1,16 +1,16 @@
-@import url('https://use.typekit.net/waz4tsx.css');
+@import url("https://use.typekit.net/waz4tsx.css");
 
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-html{
-    font-size: 62.5%;
+html {
+  font-size: 62.5%;
 }
 
-body{
-    display:block;
-    font-family: ibm-plex-sans, sans-serif;
+body {
+  display: block;
+  font-family: ibm-plex-sans, sans-serif;
 }

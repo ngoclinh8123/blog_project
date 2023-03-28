@@ -5,6 +5,8 @@ from rest_framework.decorators import action
 from module.category.models import Category
 from module.post.models import Post
 from module.post.helper.sr import PostSr
+from module.post.custom_pagination import CustomPageNumberPagination
+from util.pagination_util import PaginationUtil
 from module.category.helper.sr import CategorySr, AddCategorySr, ChangeCategorySr
 from util.tree_data_processor_util import TreeDataProcessor
 from util.response_util import ResponseUtil
@@ -24,10 +26,19 @@ class CategoryView(viewsets.GenericViewSet):
 
     def retrieve(self, request, pk):
         if type(pk) == int and pk >= 0:
-            posts = Post.objects.filter(category__id=pk)
+            # Get paginated posts
+            posts = CustomPageNumberPagination().paginate_queryset(
+                Post.objects.filter(category__id=pk), request, view=self
+            )
             serializer = PostSr(posts, many=True)
-            message = gettext("Retrieved category successfully.")
-            return ResponseUtil.success_response(message, serializer.data)
+            result = {
+                "items": serializer.data,
+                "pagination": PaginationUtil.has_pagination(
+                    request, self.queryset.count(), CustomPageNumberPagination.page_size
+                ),
+            }
+            message = gettext("Retrieved posts successfully.")
+            return ResponseUtil.success_response(message, result)
 
     @action(methods=["post"], detail=False)
     def add(self, request):
@@ -48,14 +59,14 @@ class CategoryView(viewsets.GenericViewSet):
         obj = get_object_or_404(Category, pk=pk)
         serializer = ChangeCategorySr(obj, request.data)
         if serializer.is_valid():
-            category=serializer.save()
+            category = serializer.save()
 
             # return posts of category after change
             posts = Post.objects.filter(category__id=pk)
             postsr = PostSr(posts, many=True)
 
             message = gettext("Updated category successfully.")
-            return ResponseUtil.success_response(message,postsr.data)
+            return ResponseUtil.success_response(message, postsr.data)
         message = gettext("Updated category failed.")
         return ResponseUtil.fail_response(message)
 

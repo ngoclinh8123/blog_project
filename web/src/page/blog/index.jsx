@@ -1,9 +1,10 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Form, Input, message, Avatar } from "antd";
-import { EditOutlined, SendOutlined } from "@ant-design/icons";
+import { SendOutlined } from "@ant-design/icons";
 import { AuthContext } from "/src/util/context/auth_context";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
+import convertDate from "/src/util/convert_date";
 import styles from "./blog.module.css";
 
 function Blog() {
@@ -38,27 +39,6 @@ function Blog() {
     },
   };
 
-  function openForm() {
-    if (loggedIn) {
-      api
-        .put(`/posts/api/${id}`, { title: blog.title, content: blog.content })
-        .then((response) => {
-          setShowForm(true);
-        })
-        .catch((e) => {
-          if (e.response.status === 403) {
-            message.error("You have no permissions to update this post");
-          }
-        });
-    } else {
-      message.error("Please login to do this action");
-    }
-  }
-
-  function closeForm() {
-    setShowForm(false);
-  }
-
   function getPost() {
     api
       .get(`/posts/api/${id}`)
@@ -85,28 +65,6 @@ function Blog() {
       })
       .catch((e) => {});
   }
-
-  function callUpdatePost(title, content) {
-    api
-      .put(`/posts/api/${id}`, { title: title, content: content })
-      .then((response) => {
-        getPost();
-        setShowForm(false);
-      })
-      .catch((e) => {
-        if (e.response.status === 403) {
-          message.error("You have no permissions to update this post");
-        }
-      });
-  }
-
-  // if user have login, have permission and valid data, update post
-  const handleUpdatePost = (values) => {
-    const title = values.post.title;
-    const content = values.post.content;
-
-    callUpdatePost(title, content);
-  };
 
   const handleAddComment = (values) => {
     const post = id;
@@ -149,71 +107,16 @@ function Blog() {
     <div className={styles.container}>
       {blog && (
         <div className={styles.blog}>
-          <Button
-            className={styles.btn_open_form}
-            onClick={() => openForm()}
-            style={{ display: showForm ? "none" : "block" }}
-          >
-            <EditOutlined />
-            <span>Edit</span>
-          </Button>
-
-          {/* form edit post */}
-          <div
-            className={styles.form}
-            style={{ display: showForm ? "block" : "none" }}
-          >
-            <Form
-              {...layout}
-              name="nest-messages"
-              onFinish={handleUpdatePost}
-              style={{
-                maxWidth: 600,
-              }}
-              validateMessages={validateMessages}
-            >
-              <Form.Item
-                name={["post", "title"]}
-                label="Title"
-                rules={[
-                  {
-                    required: true,
-                  },
-                ]}
-                initialValue={blog.title}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name={["post", "content"]}
-                label="Content"
-                initialValue={blog.content}
-              >
-                <Input.TextArea />
-              </Form.Item>
-              <Form.Item
-                wrapperCol={{
-                  ...layout.wrapperCol,
-                  offset: 8,
-                }}
-              >
-                <Button
-                  onClick={() => closeForm()}
-                  className={styles.btn_close_form}
-                >
-                  Cancel
-                </Button>
-                <Button type="primary" htmlType="submit">
-                  Submit
-                </Button>
-              </Form.Item>
-            </Form>
-          </div>
-
           {/* post block */}
           <div className={styles.post_content}>
             <h2 className={styles.title}>{blog.title}</h2>
             <p className={styles.content}>{blog.content}</p>
+            <div className={styles.post_info}>
+              <div className={styles.post_info_content}>
+                <span>{convertDate(blog.created_at)}</span>
+                <span>{blog.customer.username}</span>
+              </div>
+            </div>
           </div>
 
           {/* comment block */}
@@ -260,7 +163,7 @@ function Blog() {
 
             {comments.length > 0 &&
               comments.map((comment, index) => (
-                <div className={styles.comment_item_wrap}>
+                <div className={styles.comment_item_wrap} key={index}>
                   <div className={styles.comment_item}>
                     <div className={styles.comment_item_avatar}>
                       <Avatar
@@ -292,8 +195,8 @@ function Blog() {
                     </div>
                   </div>
                   {comment.childs &&
-                    comment.childs.map((child, index) => (
-                      <div className={styles.comment_sub_item} key={index}>
+                    comment.childs.map((child, ind) => (
+                      <div className={styles.comment_sub_item} key={ind}>
                         <div className={styles.comment_item_avatar}>
                           <Avatar
                             style={{
@@ -336,8 +239,3 @@ function Blog() {
 }
 
 export default Blog;
-
-// {comment.childs &&
-//   comment.childs.map((child, index) => (
-
-//   ))}
