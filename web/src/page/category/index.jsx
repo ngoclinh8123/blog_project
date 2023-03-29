@@ -1,7 +1,13 @@
 import { useState, useEffect, useContext } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { Button, Form, Input, message, Row, Col, Checkbox } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  LeftOutlined,
+  RightOutlined,
+} from "@ant-design/icons";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
 import convertDate from "/src/util/convert_date";
@@ -18,6 +24,7 @@ function Category() {
   const [isCheckedAll, setIsCheckedAll] = useState(false);
   const [checkedList, setCheckedList] = useState([]);
 
+  const navigate = useNavigate();
   // get id of category
   const { id } = useParams();
 
@@ -45,16 +52,32 @@ function Category() {
     },
   };
 
+  function getCurrentPage() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const page = searchParams.get("page");
+    return page;
+  }
+
   function getPost() {
+    const page = getCurrentPage();
+    let url = `/categories/api/${id}`;
+    if (page) {
+      url = url = `/categories/api/${id}?page=${page}`;
+    }
     api
-      .get(`/categories/api/${id}`)
+      .get(url)
       .then((response) => {
         if (response) {
+          console.log(response);
           setPosts(response.data.data.items);
-          setPaginations(response.data.data.pagination);
+          setPaginations(response.data.data.pagination.link);
         }
       })
-      .catch((e) => {});
+      .catch((e) => {
+        if (e.response.status === 404) {
+          setPosts({});
+        }
+      });
   }
 
   useEffect(() => {
@@ -146,17 +169,23 @@ function Category() {
       api
         .delete(`/posts/api/${id}`)
         .then((response) => {
-          message.success("Delete post successfully");
+          message.success(`Delete post ${id} successfully`);
           getPost();
         })
         .catch((e) => {
           if (e.response.status === 403) {
-            message.error("You have no permission to delete this post");
+            message.error(`You have no permission to delete post ${id}`);
           }
         });
     } else {
       message.error("Please login to do this action");
     }
+  }
+
+  function handleDeletePosts() {
+    checkedList.map((id) => {
+      handleDeletePost(id);
+    });
   }
 
   function handleClickEdit(post) {
@@ -184,6 +213,16 @@ function Category() {
     }
     setIsCheckedAll(checkedList.length + 1 === posts.length);
   };
+
+  function handleNavigate(desination) {
+    let page = parseInt(getCurrentPage() ? getCurrentPage() : 1);
+    if (desination === "next") {
+      page++;
+    } else if (desination === "prev") {
+      page--;
+    }
+    navigate(`?page=${page}`);
+  }
 
   function renderPostItem(post) {
     return (
@@ -263,8 +302,6 @@ function Category() {
       </Form>
     );
   }
-
-  console.log(checkedList);
 
   return (
     <div className={styles.container}>
@@ -351,40 +388,58 @@ function Category() {
 
       {/* list item */}
       <ul className={styles.post_list}>
-        {posts.map((post, index) => (
-          <Row justify="space-around" className={styles.item_row}>
-            <Col span={1} className={styles.item_col}>
-              <Checkbox
-                checked={checkedList.includes(post.id)}
-                onChange={() => handleCheckboxChange(post.id)}
-              />
-            </Col>
-            <Col span={20} className={styles.item_col}>
-              {editPost === post.id
-                ? renderFormEdit(post)
-                : renderPostItem(post)}
-            </Col>
-            <Col span={3} className={styles.item_col}>
-              <EditOutlined
-                className={styles.post_item_action}
-                onClick={() => handleClickEdit(post)}
-              />
-              <DeleteOutlined
-                className={styles.post_item_action}
-                onClick={() => handleDeletePost(post.id)}
-              />
-            </Col>
-          </Row>
-        ))}
+        {posts.length > 0 &&
+          posts.map((post, index) => (
+            <Row justify="space-around" className={styles.item_row}>
+              <Col span={1} className={styles.item_col}>
+                <Checkbox
+                  checked={checkedList.includes(post.id)}
+                  onChange={() => handleCheckboxChange(post.id)}
+                />
+              </Col>
+              <Col span={20} className={styles.item_col}>
+                {editPost === post.id
+                  ? renderFormEdit(post)
+                  : renderPostItem(post)}
+              </Col>
+              <Col span={3} className={styles.item_col}>
+                <EditOutlined
+                  className={styles.post_item_action}
+                  onClick={() => handleClickEdit(post)}
+                />
+                <DeleteOutlined
+                  className={styles.post_item_action}
+                  onClick={() => handleDeletePost(post.id)}
+                />
+              </Col>
+            </Row>
+          ))}
       </ul>
 
       <Row justify="space-around" className={styles.item_row_foot}>
         <Col span={1} className={styles.item_col_foot}>
-          {" "}
-          <Checkbox checked={isCheckedAll} onChange={handleCheckAll}></Checkbox>
+          <Button
+            className={styles.foot_item_delete}
+            onClick={() => handleDeletePosts()}
+            icon={<DeleteOutlined />}
+            disabled={checkedList.length > 0 ? false : true}
+          ></Button>
         </Col>
         <Col span={20} className={styles.item_col_foot}></Col>
-        <Col span={3} className={styles.item_col_foot}></Col>
+        <Col span={3} className={styles.item_col_foot}>
+          <Button
+            disabled={!paginations.prev ? true : false}
+            onClick={() => handleNavigate("prev")}
+            className={styles.item_foot_paginate}
+            icon={<LeftOutlined />}
+          ></Button>
+          <Button
+            disabled={!paginations.next ? true : false}
+            onClick={() => handleNavigate("next")}
+            className={styles.item_foot_paginate}
+            icon={<RightOutlined />}
+          ></Button>
+        </Col>
       </Row>
     </div>
   );

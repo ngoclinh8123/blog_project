@@ -16,6 +16,7 @@ from util.permission_util import PermissionUtil
 class CategoryView(viewsets.GenericViewSet):
     permission_classes = (PermissionUtil,)
     queryset = Category.objects.all()
+    serializer_class = CategorySr
 
     def list(self, request):
         categories = Category.objects.all()
@@ -26,15 +27,16 @@ class CategoryView(viewsets.GenericViewSet):
 
     def retrieve(self, request, pk):
         if type(pk) == int and pk >= 0:
+            query = Post.objects.filter(category__id=pk)
             # Get paginated posts
             posts = CustomPageNumberPagination().paginate_queryset(
-                Post.objects.filter(category__id=pk), request, view=self
+                query, request, view=self
             )
             serializer = PostSr(posts, many=True)
             result = {
                 "items": serializer.data,
                 "pagination": PaginationUtil.has_pagination(
-                    request, self.queryset.count(), CustomPageNumberPagination.page_size
+                    request, query.count(), CustomPageNumberPagination.page_size
                 ),
             }
             message = gettext("Retrieved posts successfully.")

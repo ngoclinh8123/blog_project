@@ -2,9 +2,9 @@
 }
 
 .btn_open_form {
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   color: white;
-  font-weight: 700;
+  font-weight: 900;
   background-color: rgba(0, 106, 255, 0.8);
   padding: 4px 8px;
   border-radius: 4px;
@@ -112,6 +112,9 @@
 
 .post_item_action {
   margin: 0 4px;
+  padding: 6px;
+  border: 1px solid #cccccc68;
+  border-radius: 4px;
 }
 
 .post_item_action:last-child {
@@ -119,6 +122,7 @@
 }
 
 .post_item_action:hover {
+  background-color: rgba(0, 123, 255, 0.493);
   color: rgba(0, 0, 0, 0.6);
 }
 
@@ -131,4 +135,25 @@
 
 .form_edit_item {
   width: 40%;
+}
+
+.item_col_foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.foot_item_delete {
+}
+
+.item_foot_paginate {
+  border-radius: 4px;
+  border: 1px solid #cccccc7b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item_foot_paginate:last-child {
+  margin-left: 12px;
 }
