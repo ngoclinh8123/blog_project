@@ -2,22 +2,22 @@ import React, { useState, useContext } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
+  FormOutlined,
   UserOutlined,
-  VideoCameraOutlined,
+  DownOutlined,
+  LogoutOutlined,
+  ApartmentOutlined,
 } from "@ant-design/icons";
-import { Layout, Menu, theme } from "antd";
-import { Link } from "react-router-dom";
+import { Layout, Menu, theme, Dropdown, Space, message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
 import MyContent from "/src/component/layout/default_layout/content";
+import api from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
 import styles from "./default_layout.module.css";
 
 const { Header, Sider, Content } = Layout;
 
-// use AuthContext to get status login
-// const { loggedIn, handleLogout } = useContext(AuthContext);
-
-const items = [
+const items_sider = [
   {
     key: "1",
     icon: <UserOutlined />,
@@ -26,13 +26,13 @@ const items = [
   },
   {
     key: "2",
-    icon: <VideoCameraOutlined />,
+    icon: <ApartmentOutlined />,
     label: "Danh mục",
     path: "/",
   },
   {
     key: "3",
-    icon: <UploadOutlined />,
+    icon: <FormOutlined />,
     label: "Bài viết",
     path: "/",
   },
@@ -40,11 +40,37 @@ const items = [
 
 function DefaultLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
+
+  // use AuthContext to get status login
+  const { loggedIn, handleLogout, user } = useContext(AuthContext);
+
+  function handleClickLogout() {
+    api
+      .post("/auth/logout/")
+      .then((response) => {
+        message.success("Đăng xuất thành công");
+        handleLogout();
+        navigate("/login");
+      })
+      .catch((e) => {});
+  }
+
+  const items = [
+    {
+      label: (
+        <span onClick={() => handleClickLogout()}>
+          {<LogoutOutlined />} Đăng xuất{" "}
+        </span>
+      ),
+      key: "0",
+    },
+  ];
+
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  // console.log(user);
   return (
     <Layout>
       <Sider
@@ -61,7 +87,7 @@ function DefaultLayout({ children }) {
           {!collapsed ? <span>LOGO</span> : <span></span>}
         </div>
         <Menu theme="light" mode="inline" defaultSelectedKeys={["1"]}>
-          {items.map((item) => (
+          {items_sider.map((item) => (
             <Menu.Item key={item.key} icon={item.icon}>
               <Link to={item.path}>{item.label}</Link>
             </Menu.Item>
@@ -82,16 +108,24 @@ function DefaultLayout({ children }) {
               onClick: () => setCollapsed(!collapsed),
             }
           )}
+          <Dropdown
+            menu={{
+              items,
+            }}
+            trigger={["click"]}
+          >
+            <a
+              onClick={(e) => e.preventDefault()}
+              className={styles.header_user_action}
+            >
+              <Space>
+                {user.username}
+                <DownOutlined />
+              </Space>
+            </a>
+          </Dropdown>
         </Header>
-        <MyContent
-          style={{
-            margin: "24px 16px",
-            padding: 24,
-            minHeight: 280,
-          }}
-        >
-          {children}
-        </MyContent>
+        <MyContent>{children}</MyContent>
       </Layout>
     </Layout>
   );

@@ -8,8 +8,9 @@ export const AuthProvider = ({ children }) => {
   const [refresh, setRefresh] = useState(false);
   const [user, setUser] = useState({});
 
-  const handleLogin = () => {
+  const handleLogin = (user) => {
     setLoggedIn(true);
+    setUser(user);
   };
 
   const handleLogout = () => {
@@ -23,10 +24,7 @@ export const AuthProvider = ({ children }) => {
       .get("/auth/user_info/")
       .then((response) => {
         if (response) {
-          console.log("ok");
-          console.log(response.data.data);
-          handleLogin();
-          setUser(response.data.data);
+          handleLogin(response.data.data);
         }
       })
       .catch((e) => {});

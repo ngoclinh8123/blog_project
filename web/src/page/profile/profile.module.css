@@ -1,0 +1,31 @@
+.info_container {
+  display: flex;
+  position: relative;
+  padding-bottom: 28px;
+}
+
+.info_container::after {
+  content: "";
+  display: block;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  height: 1px;
+  background-color: #ddddddb8;
+  z-index: 1;
+}
+
+.info {
+  margin-left: 16px;
+  flex-grow: 1;
+}
+
+.row {
+  margin: 4px 0;
+}
+
+.col_title {
+  font-size: 1.5rem;
+  font-family: sans-serif;
+  font-weight: 700;
+}

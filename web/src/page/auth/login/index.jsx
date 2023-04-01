@@ -16,9 +16,17 @@ function Login() {
         password: values.password,
       })
       .then((response) => {
-        message.success("Login success");
-        handleLogin();
-        navigate("/");
+        // get user information
+        api
+          .get("/auth/user_info/")
+          .then((response) => {
+            if (response) {
+              message.success("Login success");
+              handleLogin(response.data.data);
+              navigate("/");
+            }
+          })
+          .catch((e) => {});
       })
       .catch((e) => {
         message.error("Account does not exist");

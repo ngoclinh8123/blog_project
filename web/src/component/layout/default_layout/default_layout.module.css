@@ -19,8 +19,14 @@
   display: flex;
   align-items: center;
   font-size: 1.8rem;
+  justify-content: space-between;
 }
 
 .trigger {
   margin-left: 8px;
+}
+
+.header_user_action {
+  margin-right: 8px;
+  color: black;
 }
