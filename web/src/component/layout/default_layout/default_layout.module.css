@@ -1,0 +1,26 @@
+/* sider */
+
+.logo {
+  background-color: #eee;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  font-family: sans-serif;
+}
+
+.logo span {
+  margin-left: 28px;
+}
+
+/* header */
+.header {
+  height: 32px;
+  background-color: #eee;
+  display: flex;
+  align-items: center;
+  font-size: 1.8rem;
+}
+
+.trigger {
+  margin-left: 8px;
+}

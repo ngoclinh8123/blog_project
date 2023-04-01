@@ -17,7 +17,7 @@ const SendMailResult = lazy(() => import("/src/page/auth/send_mail_result"));
 // routes
 const publicRoutes = [
   { path: "/", page: Home, layout: DefaultLayout },
-  { path: "/profile", page: Profile, layout: DefaultLayout },
+  { path: "/app/profile", page: Profile, layout: DefaultLayout },
   { path: "/category/:id", page: Category, layout: DefaultLayout },
   { path: "/blog/:id", page: Blog, layout: DefaultLayout },
   { path: "/login", page: Login, layout: Auth },

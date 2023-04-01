@@ -23,6 +23,8 @@ export const AuthProvider = ({ children }) => {
       .get("/auth/user_info/")
       .then((response) => {
         if (response) {
+          console.log("ok");
+          console.log(response.data.data);
           handleLogin();
           setUser(response.data.data);
         }

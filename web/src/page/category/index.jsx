@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import { Button, Form, Input, message, Row, Col, Checkbox } from "antd";
 import {
@@ -20,6 +20,7 @@ function Category() {
   const [showForm, setShowForm] = useState(false);
   const [editPost, setEditPost] = useState(null);
   const location = useLocation();
+  const formAddPostRef = useRef(null);
 
   const [isCheckedAll, setIsCheckedAll] = useState(false);
   const [checkedList, setCheckedList] = useState([]);
@@ -118,6 +119,7 @@ function Category() {
   const handleAddPost = (values) => {
     const title = values.post.title;
     const content = values.post.content;
+    formAddPostRef.current.resetFields();
 
     // add new post to database
     api
@@ -349,6 +351,7 @@ function Category() {
         </div>
         <Form
           {...layout}
+          ref={formAddPostRef}
           name="nest-messages"
           onFinish={handleAddPost}
           style={{

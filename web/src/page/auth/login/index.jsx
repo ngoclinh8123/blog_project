@@ -26,7 +26,7 @@ function Login() {
   }
 
   function onFinishFailed(errorInfo) {
-    console.log("Failed:", errorInfo);
+    // console.log("Failed:", errorInfo);
   }
   return (
     <div className={styles.container}>
