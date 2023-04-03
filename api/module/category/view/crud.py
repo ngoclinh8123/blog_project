@@ -27,20 +27,10 @@ class CategoryView(viewsets.GenericViewSet):
 
     def retrieve(self, request, pk):
         if type(pk) == int and pk >= 0:
-            query = Post.objects.filter(category__id=pk)
-            # Get paginated posts
-            posts = CustomPageNumberPagination().paginate_queryset(
-                query, request, view=self
-            )
+            posts = Post.objects.filter(category__id=pk)
             serializer = PostSr(posts, many=True)
-            result = {
-                "items": serializer.data,
-                "pagination": PaginationUtil.has_pagination(
-                    request, query.count(), CustomPageNumberPagination.page_size
-                ),
-            }
             message = gettext("Retrieved posts successfully.")
-            return ResponseUtil.success_response(message, result)
+            return ResponseUtil.success_response(message, serializer.data)
 
     @action(methods=["post"], detail=False)
     def add(self, request):
@@ -61,7 +51,7 @@ class CategoryView(viewsets.GenericViewSet):
         obj = get_object_or_404(Category, pk=pk)
         serializer = ChangeCategorySr(obj, request.data)
         if serializer.is_valid():
-            category = serializer.save()
+            serializer.save()
 
             # return posts of category after change
             posts = Post.objects.filter(category__id=pk)

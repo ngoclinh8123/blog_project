@@ -1,89 +1,291 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
-import { Button, Form, Input, message, Row, Col, Checkbox } from "antd";
+import { Table, Input, Form, Modal, message, TreeSelect, Transfer } from "antd";
 import {
   PlusOutlined,
   DeleteOutlined,
   EditOutlined,
-  LeftOutlined,
-  RightOutlined,
+  EyeOutlined,
+  LineOutlined,
 } from "@ant-design/icons";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
-import convertDate from "/src/util/convert_date";
 import styles from "./category.module.css";
 
+const onChange = (pagination, filters, sorter, extra) => {
+  // console.log("params", pagination, filters, sorter, extra);
+};
+
 function Category() {
+  const [category, setCategory] = useState([]);
   const [posts, setPosts] = useState([]);
-  const [paginations, setPaginations] = useState({});
   const [refresh, setRefresh] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [editPost, setEditPost] = useState(null);
-  const location = useLocation();
-  const formAddPostRef = useRef(null);
-
-  const [isCheckedAll, setIsCheckedAll] = useState(false);
-  const [checkedList, setCheckedList] = useState([]);
-
-  const navigate = useNavigate();
-  // get id of category
-  const { id } = useParams();
-
-  // use AuthContext to get status login
+  const [addOrUpdate, setAddOrUpdate] = useState(0);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const { loggedIn, handleLogout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  // antdesign define
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  // table
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+  const hasSelected = selectedRowKeys.length > 0;
+
+  // modal
+  const formCategoryRef = useRef(null);
+  const modalRef = useRef(null);
+  const { TextArea } = Input;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
+
+  //tranfer
+  const [targetKeys, setTargetKeys] = useState([]);
   const layout = {
     labelCol: {
-      span: 8,
+      span: 4,
     },
     wrapperCol: {
-      span: 16,
+      span: 20,
     },
   };
 
-  const validateMessages = {
-    required: "${label} is required!",
-    types: {
-      email: "${label} is not a valid email!",
-      number: "${label} is not a valid number!",
-    },
-    number: {
-      range: "${label} must be between ${min} and ${max}",
-    },
-  };
-
-  function getCurrentPage() {
-    const searchParams = new URLSearchParams(window.location.search);
-    const page = searchParams.get("page");
-    return page;
-  }
-
-  function getPost() {
-    const page = getCurrentPage();
-    let url = `/categories/api/${id}`;
-    if (page) {
-      url = url = `/categories/api/${id}?page=${page}`;
-    }
+  function getCategory() {
     api
-      .get(url)
+      .get("/categories/api")
       .then((response) => {
         if (response) {
-          console.log(response);
-          setPosts(response.data.data.items);
-          setPaginations(response.data.data.pagination.link);
+          setCategory(response.data.data);
         }
       })
       .catch((e) => {
+        if (e.response.status === 404) {
+          setCategory({});
+        }
+      });
+  }
+
+  function getPost() {
+    api
+      .get(`/posts/api`)
+      .then((response) => {
+        if (response) {
+          setPosts(response.data.data);
+        }
+      })
+      .catch((e) => {
+        console.log("aaaaa");
         if (e.response.status === 404) {
           setPosts({});
         }
       });
   }
 
+  // table
+  function handleTitleFilter() {
+    const result = [];
+    if (category.length > 0) {
+      category.forEach((item) => {
+        if (item.childs) {
+          const item_child = [];
+          item.childs.forEach((child) => {
+            item_child.push({ text: child.title, value: child.title });
+          });
+          result.push({
+            text: item.title,
+            value: item.title,
+            children: item_child,
+          });
+        } else {
+          result.push({ text: item.title, value: item.title });
+        }
+      });
+    }
+    return result;
+  }
+
+  function getParentTitle(id) {
+    if (id === 0) {
+      return <LineOutlined />;
+      // return "";
+    }
+    let result = "";
+    if (category.length > 0) {
+      category.forEach((item) => {
+        if (item.id === id) {
+          result = item.title;
+        }
+        if (item.childs) {
+          item.childs.forEach((child) => {
+            if (child.id === id) {
+              result = child.title;
+            }
+          });
+        }
+      });
+      return result;
+    }
+    return result;
+  }
+
+  function handleTreeSelectItem() {
+    const result = [];
+    result.push({ value: 0, title: <LineOutlined /> });
+    if (category.length > 0) {
+      category.forEach((item) => {
+        if (item.childs) {
+          const item_child = [];
+          item.childs.forEach((child) => {
+            item_child.push({ value: child.id, title: child.title });
+          });
+          result.push({
+            value: item.id,
+            title: item.title,
+            children: item_child,
+          });
+        } else {
+          result.push({ value: item.id, title: item.title });
+        }
+      });
+    }
+    return result;
+  }
+
+  function getCategoryInfo(id) {
+    let result = { title: "", parent_id: "", posts: [] };
+    if (category.length > 0) {
+      category.forEach((item) => {
+        if (item.id == id) {
+          result = item;
+        }
+        if (item.childs) {
+          item.childs.forEach((child) => {
+            if (child.id == id) {
+              result = child;
+            }
+          });
+        }
+      });
+    }
+    return result;
+  }
+
+  function handleTitleData() {
+    const result = [];
+    if (category.length > 0) {
+      category.forEach((item) => {
+        result.push({
+          key: item.id,
+          id: item.id,
+          title: item.title,
+          parent: getParentTitle(item.parent_id), // khong co parent :))
+          posts:
+            item.posts.length > 0 ? item.posts.join(", ") : <LineOutlined />,
+        });
+        if (item.childs) {
+          item.childs.forEach((child) => {
+            result.push({
+              key: child.id,
+              id: child.id,
+              title: child.title,
+              parent: getParentTitle(child.parent_id),
+              posts:
+                child.posts.length > 0 ? (
+                  child.posts.join(", ")
+                ) : (
+                  <LineOutlined />
+                ),
+            });
+          });
+        }
+      });
+    }
+    return result;
+  }
+
+  function handleDataSelectPost() {
+    const result = [];
+    if (posts.length > 0) {
+      posts.forEach((post) => {
+        result.push({ key: post.id, title: post.title });
+      });
+    }
+    return result;
+  }
+
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.id - b.id,
+      width: "5%",
+    },
+    {
+      title: "Danh mục",
+      dataIndex: "title",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.title.localeCompare(b.title),
+      filters: handleTitleFilter(),
+      filterMode: "tree",
+      filterSearch: true,
+      onFilter: (value, record) => record.title.includes(value),
+      width: "20%",
+      className: styles.header_title,
+    },
+    {
+      title: "Danh mục cha",
+      dataIndex: "parent",
+      width: "20%",
+      className: styles.header_title,
+    },
+    {
+      title: "Bài viết",
+      dataIndex: "posts",
+      width: "40%",
+      className: styles.header_title,
+    },
+    {
+      title: (
+        <PlusOutlined
+          onClick={() => handleClickAddCategory()}
+          className={styles.btn_add}
+        />
+      ),
+      dataIndex: "",
+      key: "x",
+      render: (value) => (
+        <span>
+          <EyeOutlined
+            onClick={() => handleClickViewCategory(value.key)}
+            className={styles.btn_action}
+            title="xem bài viết thuộc danh mục"
+          />
+          <EditOutlined
+            onClick={() => handleClickEditCategory(value.key)}
+            className={styles.btn_action}
+            title="sửa danh mục"
+          />
+          <DeleteOutlined
+            onClick={() => handleClickDeleteCategory(value.key)}
+            className={styles.btn_action}
+            title="xóa danh mục"
+          />
+        </span>
+      ),
+    },
+  ];
+
+  const data = handleTitleData();
+
   useEffect(() => {
+    getCategory();
     getPost();
-  }, [location, refresh]);
+  }, [refresh]);
 
   // Use an effect hook to set the onTokenRefreshed callback to update the refresh flag
   useEffect(() => {
@@ -92,358 +294,220 @@ function Category() {
     });
   }, []);
 
-  function openForm() {
-    if (loggedIn) {
-      setShowForm(true);
-    } else {
-      message.error("Please login to do this action");
+  function handleClickAddCategory() {
+    showModal();
+  }
+
+  function handleAddCategory(values) {
+    if (!values.posts) {
+      values.posts = [];
     }
-  }
 
-  function closeForm() {
-    setShowForm(false);
-  }
-
-  function closeFormEdit() {
-    setEditPost(null);
-  }
-
-  function gatherPostId() {
-    const arrPostId = [];
-    posts.forEach((post) => {
-      arrPostId.push(post.id);
-    });
-    return arrPostId;
-  }
-
-  const handleAddPost = (values) => {
-    const title = values.post.title;
-    const content = values.post.content;
-    formAddPostRef.current.resetFields();
-
-    // add new post to database
-    api
-      .post(`/posts/api/`, { title: title, content: content })
-      .then((response) => {
-        const arrPostId = gatherPostId();
-        const newPostId = response.data.data;
-        arrPostId.push(newPostId);
-
-        // update category with new post
-        api
-          .put(`/categories/api/${id}/`, { posts: arrPostId })
-          .then((response) => {
-            message.success("Add post success");
-            setPosts(response.data.data);
-            setShowForm(false);
-          })
-          .catch((e) => {});
-      })
-      .catch((e) => {});
-  };
-
-  function callUpdatePost(title, content, id) {
-    api
-      .put(`/posts/api/${id}`, { title: title, content: content })
-      .then((response) => {
-        getPost();
-        setEditPost(null);
-        message.success("Updated post successfully");
-      })
-      .catch((e) => {
-        if (e.response.status === 403) {
-          message.error("You have no permissions to edit this post");
-        }
-      });
-  }
-
-  // if user have login, have permission and valid data, update post
-  const handleUpdatePost = (values) => {
-    const title = values.post.title;
-    const content = values.post.content;
-
-    callUpdatePost(title, content, editPost);
-  };
-
-  function handleDeletePost(id) {
     if (loggedIn) {
-      // call api to delete post here
       api
-        .delete(`/posts/api/${id}`)
+        .post(`/categories/api/`, {
+          title: values.title,
+          parent_id: values.parent_id,
+          posts: values.posts,
+        })
         .then((response) => {
-          message.success(`Delete post ${id} successfully`);
-          getPost();
+          getCategory();
+          message.success("Thêm danh mục thành công");
+          setIsModalOpen(false);
+          formCategoryRef.current.resetFields();
         })
         .catch((e) => {
           if (e.response.status === 403) {
-            message.error(`You have no permission to delete post ${id}`);
+            setIsModalOpen(false);
+            formCategoryRef.current.resetFields();
+            message.error("Bạn không có quyền thêm danh mục");
+          } else if (e.response.status === 400) {
+            message.error("Danh mục đã tồn tại");
           }
         });
     } else {
-      message.error("Please login to do this action");
+      message.error("Vui lòng đăng nhập để thực hiện hành động này");
+      setIsModalOpen(false);
     }
   }
 
-  function handleDeletePosts() {
-    checkedList.map((id) => {
-      handleDeletePost(id);
-    });
-  }
-
-  function handleClickEdit(post) {
+  function handleClickDeleteCategory(id) {
     if (loggedIn) {
-      setEditPost(post.id);
-    } else {
-      message.error("Please login to do this action");
-    }
-  }
-
-  const handleCheckAll = (e) => {
-    setIsCheckedAll(e.target.checked);
-    if (e.target.checked) {
-      setCheckedList(posts.map((post) => post.id));
-    } else {
-      setCheckedList([]);
-    }
-  };
-
-  const handleCheckboxChange = (postId) => {
-    if (checkedList.includes(postId)) {
-      setCheckedList(checkedList.filter((id) => id !== postId));
-    } else {
-      setCheckedList([...checkedList, postId]);
-    }
-    setIsCheckedAll(checkedList.length + 1 === posts.length);
-  };
-
-  function handleNavigate(desination) {
-    let page = parseInt(getCurrentPage() ? getCurrentPage() : 1);
-    if (desination === "next") {
-      page++;
-    } else if (desination === "prev") {
-      page--;
-    }
-    navigate(`?page=${page}`);
-  }
-
-  function renderPostItem(post) {
-    return (
-      <Link to={`/blog/${post.id}`} className={styles.post_item_link}>
-        <Row justify="space-around" className={styles.item_sub_row}>
-          <Col span={12} className={styles.item_sub_col}>
-            <span className={styles.item_title}>{post.title}</span>
-          </Col>
-          <Col span={4} className={styles.item_sub_col}>
-            <span className={styles.item_title}>{post.customer.username}</span>
-          </Col>
-          <Col span={4} className={styles.item_sub_col}>
-            <span className={styles.item_title}>
-              {convertDate(post.created_at)}
-            </span>
-          </Col>
-          <Col span={4} className={styles.item_sub_col}>
-            <span className={styles.item_title}>
-              {convertDate(post.updated_at)}
-            </span>
-          </Col>
-        </Row>
-      </Link>
-    );
-  }
-
-  function renderFormEdit(post) {
-    return (
-      <Form
-        {...layout}
-        name="nest-messages"
-        onFinish={handleUpdatePost}
-        style={
-          {
-            // maxWidth: 600,
+      api
+        .delete(`/categories/api/${id}`)
+        .then((response) => {
+          getCategory();
+          message.success("Xóa danh mục thành công");
+        })
+        .catch((e) => {
+          if (e.response.status === 403) {
+            message.error("Bạn không có quyền xóa danh mục");
           }
-        }
-        validateMessages={validateMessages}
-      >
-        <div className={styles.form_edit_row}>
-          <Form.Item
-            name={["post", "title"]}
-            label="Title"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-            className={styles.form_edit_item}
-            initialValue={post.title}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name={["post", "content"]}
-            label="Content"
-            className={styles.form_edit_item}
-            initialValue={post.content}
-          >
-            <Input.TextArea />
-          </Form.Item>
-        </div>
-
-        <Form.Item
-          wrapperCol={{
-            ...layout.wrapperCol,
-            offset: 8,
-          }}
-        >
-          <Button onClick={closeFormEdit} className={styles.btn_close_form}>
-            Cancel
-          </Button>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
-    );
+        });
+    } else {
+      message.error("Vui lòng đăng nhập để thực hiện hành động này");
+      setIsModalOpen(false);
+    }
   }
+
+  function handleDeleteCategories() {
+    console.log("delete many itme");
+  }
+
+  function handleClickEditCategory(id) {
+    setAddOrUpdate(id);
+    showModal();
+  }
+
+  function handleUpdateCategory(values) {
+    if (!values.posts) {
+      values.posts = [];
+    }
+
+    if (loggedIn) {
+      api
+        .put(`/categories/api/${addOrUpdate}/`, {
+          title: values.title,
+          parent_id: values.parent_id,
+          posts: values.posts,
+        })
+        .then((response) => {
+          getCategory();
+          message.success("Sửa  danh mục thành công");
+          setIsModalOpen(false);
+          formCategoryRef.current.resetFields();
+        })
+        .catch((e) => {
+          if (e.response.status === 403) {
+            setIsModalOpen(false);
+            formCategoryRef.current.resetFields();
+            message.error("Bạn không có quyền sửa danh mục");
+          } else if (e.response.status === 400) {
+            message.error("Danh mục đã tồn tại");
+          }
+        });
+    } else {
+      message.error("Vui lòng đăng nhập để thực hiện hành động này");
+      setIsModalOpen(false);
+    }
+  }
+
+  function handleClickViewCategory(id) {
+    navigate(`/app/category/${id}`);
+  }
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    form.submit();
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setAddOrUpdate(0);
+    formCategoryRef.current.resetFields();
+  };
+
+  const handleChangeSelectPostAdd = (newTargetKeys) => {
+    setTargetKeys(newTargetKeys);
+  };
+
+  // modal
+  // update initialValue of form when item change
+  useEffect(() => {
+    setTargetKeys(getCategoryInfo(addOrUpdate).posts);
+    form.setFieldsValue({
+      title: getCategoryInfo(addOrUpdate).title,
+      parent_id: getCategoryInfo(addOrUpdate).parent_id,
+      posts: getCategoryInfo(addOrUpdate).posts,
+    });
+  }, [addOrUpdate]);
 
   return (
     <div className={styles.container}>
-      <Row justify="space-around" className={styles.item_row_head}>
-        <Col span={1} className={styles.item_col_head}>
-          {" "}
-          <Checkbox checked={isCheckedAll} onChange={handleCheckAll}></Checkbox>
-        </Col>
-        <Col span={20} className={styles.item_col_head}>
-          <Row justify="space-around" className={styles.item_sub_row_head}>
-            <Col span={12} className={styles.item_sub_col_head}>
-              <span>Title</span>
-            </Col>
-            <Col span={4} className={styles.item_sub_col_head}>
-              <span>Author</span>
-            </Col>
-            <Col span={4} className={styles.item_sub_col_head}>
-              <span>Created at</span>
-            </Col>
-            <Col span={4} className={styles.item_sub_col_head}>
-              <span>Updated at</span>
-            </Col>
-          </Row>
-        </Col>
-        <Col span={3} className={styles.item_col_head}>
-          {/* button open form add post */}
-          <button
-            onClick={openForm}
-            className={styles.btn_open_form}
-            style={{ display: showForm ? "none" : "block" }}
-          >
-            {" "}
-            <PlusOutlined />{" "}
-          </button>
-        </Col>
-      </Row>
-
-      {/* form add post */}
+      <Table
+        rowSelection={rowSelection}
+        columns={columns}
+        dataSource={data}
+        onChange={onChange}
+        className={styles.table}
+      />
       <div
-        className={styles.form}
-        style={{ display: showForm ? "block" : "none" }}
+        style={{
+          marginBottom: 16,
+        }}
+        className={styles.selected_count}
       >
-        <div className={styles.form_title}>
-          <span>Add new post</span>
-        </div>
-        <Form
-          {...layout}
-          ref={formAddPostRef}
-          name="nest-messages"
-          onFinish={handleAddPost}
+        <span>
+          {selectedRowKeys.length > 0 ? (
+            <DeleteOutlined
+              className={styles.btn_delete_all}
+              title="Xóa danh mục đã chọn"
+              onClick={() => handleDeleteCategories()}
+            />
+          ) : (
+            <DeleteOutlined className={styles.btn_delete_all_disabled} />
+          )}
+        </span>
+        <span
           style={{
-            maxWidth: 600,
+            marginLeft: 8,
           }}
-          validateMessages={validateMessages}
+        >
+          {hasSelected ? `Đã chọn ${selectedRowKeys.length} danh mục` : ""}
+        </span>
+      </div>
+      <Modal
+        title={
+          addOrUpdate == 0 ? "Thêm danh mục mới" : `Sửa danh mục ${addOrUpdate}`
+        }
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width="70%"
+        className={styles.modal}
+        ref={modalRef}
+      >
+        <Form
+          form={form}
+          onFinish={addOrUpdate == 0 ? handleAddCategory : handleUpdateCategory}
+          {...layout}
+          ref={formCategoryRef}
         >
           <Form.Item
-            name={["post", "title"]}
-            label="Title"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
+            label="Tên"
+            name="title"
+            rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
           >
-            <Input />
+            <TextArea placeholder="Tên danh mục..." autoSize />
           </Form.Item>
-          <Form.Item name={["post", "content"]} label="Content">
-            <Input.TextArea />
-          </Form.Item>
+
           <Form.Item
-            wrapperCol={{
-              ...layout.wrapperCol,
-              offset: 8,
-            }}
+            label=" Danh mục cha"
+            name="parent_id"
+            rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
           >
-            <Button onClick={closeForm} className={styles.btn_close_form}>
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
+            <TreeSelect
+              placeholder="Chọn danh mục cha"
+              treeLine="true"
+              style={{ width: 300 }}
+              treeData={handleTreeSelectItem()}
+            />
+          </Form.Item>
+          <Form.Item label="Bài viết" name="posts" style={{ width: "100%" }}>
+            <Transfer
+              dataSource={handleDataSelectPost()}
+              showSearch
+              targetKeys={targetKeys}
+              onChange={handleChangeSelectPostAdd}
+              render={(item) => item.title}
+              className={styles.form_transfer}
+            />
           </Form.Item>
         </Form>
-      </div>
-
-      {/* list item */}
-      <ul className={styles.post_list}>
-        {posts.length > 0 &&
-          posts.map((post, index) => (
-            <Row justify="space-around" className={styles.item_row}>
-              <Col span={1} className={styles.item_col}>
-                <Checkbox
-                  checked={checkedList.includes(post.id)}
-                  onChange={() => handleCheckboxChange(post.id)}
-                />
-              </Col>
-              <Col span={20} className={styles.item_col}>
-                {editPost === post.id
-                  ? renderFormEdit(post)
-                  : renderPostItem(post)}
-              </Col>
-              <Col span={3} className={styles.item_col}>
-                <EditOutlined
-                  className={styles.post_item_action}
-                  onClick={() => handleClickEdit(post)}
-                />
-                <DeleteOutlined
-                  className={styles.post_item_action}
-                  onClick={() => handleDeletePost(post.id)}
-                />
-              </Col>
-            </Row>
-          ))}
-      </ul>
-
-      <Row justify="space-around" className={styles.item_row_foot}>
-        <Col span={1} className={styles.item_col_foot}>
-          <Button
-            className={styles.foot_item_delete}
-            onClick={() => handleDeletePosts()}
-            icon={<DeleteOutlined />}
-            disabled={checkedList.length > 0 ? false : true}
-          ></Button>
-        </Col>
-        <Col span={20} className={styles.item_col_foot}></Col>
-        <Col span={3} className={styles.item_col_foot}>
-          <Button
-            disabled={!paginations.prev ? true : false}
-            onClick={() => handleNavigate("prev")}
-            className={styles.item_foot_paginate}
-            icon={<LeftOutlined />}
-          ></Button>
-          <Button
-            disabled={!paginations.next ? true : false}
-            onClick={() => handleNavigate("next")}
-            className={styles.item_foot_paginate}
-            icon={<RightOutlined />}
-          ></Button>
-        </Col>
-      </Row>
+      </Modal>
     </div>
   );
 }

@@ -18,18 +18,10 @@ class PostView(viewsets.GenericViewSet):
 
     def list(self, request):
         # Get paginated posts
-        posts = CustomPageNumberPagination().paginate_queryset(
-            self.queryset, request, view=self
-        )
+        posts = self.queryset
         serializer = PostSr(posts, many=True)
-        result = {
-            "items": serializer.data,
-            "pagination": PaginationUtil.has_pagination(
-                request, self.queryset.count(), CustomPageNumberPagination.page_size
-            ),
-        }
         message = gettext("Retrieved posts successfully.")
-        return ResponseUtil.success_response(message, result)
+        return ResponseUtil.success_response(message, serializer.data)
 
     def retrieve(self, request, pk=None):
         post = get_object_or_404(self.queryset, pk=pk)

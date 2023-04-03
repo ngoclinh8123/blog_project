@@ -8,10 +8,6 @@
   font-size: 1.4rem;
 }
 
-.table thead tr th:first-child {
-  width: 2%;
-}
-
 .btn_add {
   padding: 4px 14px;
   background-color: rgb(0, 132, 255);
@@ -47,8 +43,4 @@
   position: absolute;
   bottom: 20px;
   left: 0;
-}
-
-.form_transfer > div:not(:nth-child(2)) {
-  width: 40%;
 }

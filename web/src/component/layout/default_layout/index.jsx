@@ -9,7 +9,7 @@ import {
   ApartmentOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, theme, Dropdown, Space, message } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import MyContent from "/src/component/layout/default_layout/content";
 import api from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
@@ -17,30 +17,32 @@ import styles from "./default_layout.module.css";
 
 const { Header, Sider, Content } = Layout;
 
-const items_sider = [
-  {
-    key: "1",
-    icon: <UserOutlined />,
-    label: "Hồ sơ",
-    path: "/app/profile",
-  },
-  {
-    key: "2",
-    icon: <ApartmentOutlined />,
-    label: "Danh mục",
-    path: "/",
-  },
-  {
-    key: "3",
-    icon: <FormOutlined />,
-    label: "Bài viết",
-    path: "/",
-  },
-];
-
 function DefaultLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
   const navigate = useNavigate();
+  const currentPath = location.pathname;
+
+  const items_sider = [
+    {
+      key: "1",
+      icon: <UserOutlined />,
+      label: "Hồ sơ",
+      path: "/app/profile",
+    },
+    {
+      key: "2",
+      icon: <ApartmentOutlined />,
+      label: "Danh mục",
+      path: "/app/category",
+    },
+    {
+      key: "3",
+      icon: <FormOutlined />,
+      label: "Bài viết",
+      path: "/",
+    },
+  ];
 
   // use AuthContext to get status login
   const { loggedIn, handleLogout, user } = useContext(AuthContext);
@@ -54,6 +56,16 @@ function DefaultLayout({ children }) {
         navigate("/login");
       })
       .catch((e) => {});
+  }
+
+  function getCurrentPageSelected() {
+    let result = 1;
+    items_sider.forEach((item) => {
+      if (item.path === currentPath) {
+        result = item.key;
+      }
+    });
+    return result;
   }
 
   const items = [
@@ -80,13 +92,17 @@ function DefaultLayout({ children }) {
         style={{
           backgroundColor: "#fff",
           borderRight: "1px solid #ccc",
-          height: "100vh",
+          minHeight: "100vh",
         }}
       >
         <div className={styles.logo}>
           {!collapsed ? <span>LOGO</span> : <span></span>}
         </div>
-        <Menu theme="light" mode="inline" defaultSelectedKeys={["1"]}>
+        <Menu
+          theme="light"
+          mode="inline"
+          defaultSelectedKeys={[getCurrentPageSelected()]}
+        >
           {items_sider.map((item) => (
             <Menu.Item key={item.key} icon={item.icon}>
               <Link to={item.path}>{item.label}</Link>
