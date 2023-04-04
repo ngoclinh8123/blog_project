@@ -1,100 +1,182 @@
 import { useState, useEffect, useContext, useRef } from "react";
-import { useParams } from "react-router-dom";
-import { Button, Form, Input, message, Avatar } from "antd";
-import { SendOutlined } from "@ant-design/icons";
-import { AuthContext } from "/src/util/context/auth_context";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { Form, Input, message, Table, Modal } from "antd";
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
+import { AuthContext } from "/src/util/context/auth_context";
 import convertDate from "/src/util/convert_date";
 import styles from "./blog.module.css";
 
+const onChange = (pagination, filters, sorter, extra) => {
+  // console.log("params", pagination, filters, sorter, extra);
+};
+
 function Blog() {
-  const [blog, setBlog] = useState();
-  const [comments, setComments] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const { id } = useParams();
-  const formCommentRef = useRef(null);
+  const [addOrUpdate, setAddOrUpdate] = useState(0);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { loggedIn, handleLogout } = useContext(AuthContext);
 
-  // use AuthContext to get status login
-  const { loggedIn, handleLogout, user } = useContext(AuthContext);
+  // table
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+  const hasSelected = selectedRowKeys.length > 0;
 
-  // antdesign define
+  // modal
+  const formPostRef = useRef(null);
+  const modalRef = useRef(null);
+  const { TextArea } = Input;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
   const layout = {
     labelCol: {
-      span: 8,
+      span: 2,
     },
     wrapperCol: {
-      span: 16,
+      span: 20,
     },
   };
 
-  const validateMessages = {
-    required: "${label} is required!",
-    types: {
-      email: "${label} is not a valid email!",
-      number: "${label} is not a valid number!",
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.id - b.id,
+      width: "5%",
     },
-    number: {
-      range: "${label} must be between ${min} and ${max}",
+    {
+      title: "Tiêu đề",
+      dataIndex: "title",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.title.length - b.title.length,
+      width: "30%",
     },
-  };
+    {
+      title: "Tác giả",
+      dataIndex: "customer",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.customer.localeCompare(b.customer),
+      filters: handleCustomerFilter(),
+      filterMode: "tree",
+      filterSearch: true,
+      onFilter: (value, record) => record.title.includes(value),
+      width: "15%",
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "created_at",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.title.length - b.title.length,
+      // width: "30%",
+    },
+    {
+      title: "Ngày cập nhật",
+      dataIndex: "updated_at",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.title.length - b.title.length,
+      // width: "30%",
+    },
+    {
+      title: (
+        <PlusOutlined
+          onClick={() => handleClickAddPost()}
+          className={styles.btn_add}
+        />
+      ),
+      dataIndex: "",
+      key: "x",
+      render: (value) => (
+        <span>
+          <EyeOutlined
+            onClick={() => handleClickViewPost(value.key)}
+            className={styles.btn_action}
+            title="xem bài viết"
+          />
+          <EditOutlined
+            onClick={() => handleClickEditPost(value.key)}
+            className={styles.btn_action}
+            title="sửa bài viết"
+          />
+          <DeleteOutlined
+            onClick={() => handleClickDeletePost(value.key)}
+            className={styles.btn_action}
+            title="xóa bài viết"
+          />
+        </span>
+      ),
+    },
+  ];
+
+  const data = handlePostData();
+
+  function handlePostData() {
+    const result = [];
+    if (posts.length > 0) {
+      posts.forEach((post) => {
+        result.push({
+          key: post.id,
+          id: post.id,
+          title: post.title,
+          customer: post.customer.username,
+          created_at: convertDate(post.created_at),
+          updated_at: convertDate(post.updated_at),
+        });
+      });
+    }
+    return result;
+  }
+
+  function handleCustomerFilter() {
+    const result = [];
+    const arrCustomer = [];
+    if (posts.length > 0) {
+      posts.forEach((post) => {
+        if (!arrCustomer.includes(post.customer.username)) {
+          arrCustomer.push(post.customer.username);
+        }
+      });
+    }
+    if (arrCustomer.length > 0) {
+      arrCustomer.forEach((customer) => {
+        result.push({ text: customer, value: customer });
+      });
+    }
+    return result;
+  }
 
   function getPost() {
     api
-      .get(`/posts/api/${id}`)
+      .get(`/posts/api`)
       .then((response) => {
-        setBlog(response.data.data);
+        if (response) {
+          console.log("get post scc");
+          setPosts(response.data.data);
+        }
       })
-      .catch((e) => {});
+      .catch((e) => {
+        if (e.response.status === 404) {
+          setPosts({});
+        }
+      });
   }
 
-  function getComments() {
-    api
-      .get(`/comments/api/${id}`)
-      .then((response) => {
-        setComments(response.data.data);
-      })
-      .catch((e) => {});
-  }
-
-  function handleDeleteComment(id) {
-    api
-      .delete(`/comments/api/${id}`)
-      .then((response) => {
-        getComments();
-      })
-      .catch((e) => {});
-  }
-
-  const handleAddComment = (values) => {
-    const post = id;
-    const parent_id = 0;
-    const content = values.comment;
-    formCommentRef.current.resetFields();
-    if (loggedIn) {
-      api
-        .post(`/comments/api/`, {
-          parent_id: parent_id,
-          content: content,
-          post: post,
-        })
-        .then((response) => {
-          getComments();
-          message.success("Add comment successfully");
-        })
-        .catch((e) => {
-          message.error("Error while adding comment");
-        });
-    } else {
-      message.error("Please login to do this action");
-    }
-  };
-
-  // Use an effect hook to fetch the user information from the API when the refresh flag changes
   useEffect(() => {
     getPost();
-    getComments();
-  }, [refresh]);
+  }, [location, refresh]);
 
   // Use an effect hook to set the onTokenRefreshed callback to update the refresh flag
   useEffect(() => {
@@ -103,137 +185,207 @@ function Blog() {
     });
   }, []);
 
+  function getInfoPost(id) {
+    let result = {};
+    if (posts.length > 0) {
+      posts.forEach((post) => {
+        if (id == post.id) {
+          result = post;
+        }
+        if (post.childs) {
+          post.childs.forEach((child) => {
+            if (id == child.id) {
+              result = child;
+            }
+          });
+        }
+      });
+    }
+    return result;
+  }
+
+  function handleClickDeletePost(id) {
+    if (loggedIn) {
+      // call api to delete post here
+      callDeletePost(id);
+    } else {
+      message.error("Vui lòng đăng nhập để thực hiện hành dộng");
+    }
+  }
+
+  function callDeletePost(id) {
+    api
+      .delete(`/posts/api/${id}`)
+      .then((response) => {
+        message.success(`Xóa bài viết ${id} thành công`);
+        getPost();
+      })
+      .catch((e) => {
+        if (e.response.status === 403) {
+          message.error(`Bạn không có quyền xóa bài viết ${id}`);
+        }
+      });
+  }
+
+  function handleDeletePosts() {
+    selectedRowKeys.map((id) => {
+      callDeletePost(id);
+    });
+  }
+
+  function handleClickEditPost(id) {
+    setAddOrUpdate(id);
+    showModal();
+  }
+
+  const handleUpdatePost = (values) => {
+    if (loggedIn) {
+      api
+        .put(`/posts/api/${addOrUpdate}`, {
+          title: values.title,
+          content: values.content,
+        })
+        .then((response) => {
+          getPost();
+          setIsModalOpen(false);
+          setAddOrUpdate(0);
+          message.success("Cập nhật bài viết thành công");
+        })
+        .catch((e) => {
+          if (e.response.status === 403) {
+            message.error("Bạn không có quyền sửa bài viết này");
+            setIsModalOpen(false);
+            setAddOrUpdate(0);
+          }
+        });
+    } else {
+      message.error("Vui lòng đăng nhập để sửa bài viết");
+    }
+  };
+
+  function handleClickViewPost(id) {
+    navigate(`/app/blog/${id}`);
+  }
+
+  function handleClickAddPost() {
+    showModal();
+  }
+
+  const handleAddPost = (values) => {
+    const title = values.title;
+    const content = values.content;
+    formPostRef.current.resetFields();
+
+    // // add new post to database
+    api
+      .post(`/posts/api/`, { title: title, content: content })
+      .then((response) => {
+        getPost();
+        setIsModalOpen(false);
+        message.success("Thêm bài viết thành công");
+      })
+      .catch((e) => {});
+  };
+
+  // modal
+  // update initialValue of form when item change
+  useEffect(() => {
+    form.setFieldsValue({
+      title: getInfoPost(addOrUpdate).title,
+      content: getInfoPost(addOrUpdate).content,
+    });
+  }, [addOrUpdate]);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    form.submit();
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setAddOrUpdate(0);
+    formPostRef.current.resetFields();
+  };
+
   return (
     <div className={styles.container}>
-      {blog && (
-        <div className={styles.blog}>
-          {/* post block */}
-          <div className={styles.post_content}>
-            <h2 className={styles.title}>{blog.title}</h2>
-            <p className={styles.content}>{blog.content}</p>
-            <div className={styles.post_info}>
-              <div className={styles.post_info_content}>
-                <span>{convertDate(blog.created_at)}</span>
-                <span>{blog.customer.username}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* comment block */}
-          <div className={styles.comment_block}>
-            <div className={styles.total_comment}>
-              <span>Comment</span>
-              <span>( {comments.length} )</span>
-            </div>
-            <div className={styles.comment_form_block}>
-              <Form
-                ref={formCommentRef}
-                className={styles.comment_form}
-                {...layout}
-                name="nest-messages"
-                onFinish={handleAddComment}
-                style={{
-                  maxWidth: 600,
-                }}
-                validateMessages={validateMessages}
-              >
-                <Form.Item
-                  className={styles.item_add_comment}
-                  name={["comment"]}
-                  rules={[
-                    {
-                      required: true,
-                    },
-                  ]}
-                >
-                  <Input.TextArea
-                    placeholder="Your comment..."
-                    className={styles.input_add_comment}
-                    style={{ flexGrow: 1 }}
-                  />
-                </Form.Item>
-                <Button
-                  className={styles.btn_add_comment}
-                  type="primary"
-                  htmlType="submit"
-                  icon={<SendOutlined />}
-                ></Button>
-              </Form>
-            </div>
-
-            {comments.length > 0 &&
-              comments.map((comment, index) => (
-                <div className={styles.comment_item_wrap} key={index}>
-                  <div className={styles.comment_item}>
-                    <div className={styles.comment_item_avatar}>
-                      <Avatar
-                        style={{
-                          backgroundColor: "#f56a00",
-                          verticalAlign: "middle",
-                        }}
-                        size="medium"
-                      >
-                        {comment.customer.username[0]}
-                      </Avatar>
-                    </div>
-                    <div className={styles.comment_item_content_action}>
-                      <div className={styles.comment_item_content}>
-                        <div className={styles.comment_item_user}>
-                          {comment.customer.username}
-                        </div>
-                        <div className={styles.comment_item_title}>
-                          {comment.content}
-                        </div>
-                      </div>
-                      <div className={styles.comment_item_action}>
-                        {user.username === comment.customer.username && (
-                          <span onClick={() => handleDeleteComment(comment.id)}>
-                            Delete
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  {comment.childs &&
-                    comment.childs.map((child, ind) => (
-                      <div className={styles.comment_sub_item} key={ind}>
-                        <div className={styles.comment_item_avatar}>
-                          <Avatar
-                            style={{
-                              backgroundColor: "#f56a00",
-                              verticalAlign: "middle",
-                            }}
-                            size="medium"
-                          >
-                            {child.customer.username[0]}
-                          </Avatar>
-                        </div>
-                        <div className={styles.comment_item_content_action}>
-                          <div className={styles.comment_item_content}>
-                            <div className={styles.comment_item_user}>
-                              {child.customer.username}
-                            </div>
-                            <div className={styles.comment_item_title}>
-                              {child.content}
-                            </div>
-                          </div>
-                          <div className={styles.comment_item_action}>
-                            {user.username === child.customer.username && (
-                              <span
-                                onClick={() => handleDeleteComment(child.id)}
-                              >
-                                Delete
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              ))}
-          </div>
+      <div>
+        <Table
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={data}
+          onChange={onChange}
+          className={styles.table}
+        />
+        <div
+          style={{
+            marginBottom: 16,
+          }}
+          className={styles.selected_count}
+        >
+          <span>
+            {selectedRowKeys.length > 0 ? (
+              <DeleteOutlined
+                className={styles.btn_delete_all}
+                title="Xóa bài viết đã chọn"
+                onClick={() => handleDeletePosts()}
+              />
+            ) : (
+              <DeleteOutlined className={styles.btn_delete_all_disabled} />
+            )}
+          </span>
+          <span
+            style={{
+              marginLeft: 8,
+            }}
+          >
+            {hasSelected ? `Đã chọn ${selectedRowKeys.length} bài viết` : ""}
+          </span>
         </div>
-      )}
+      </div>
+      <Modal
+        title={
+          addOrUpdate == 0 ? "Thêm bài viết mới" : `Sửa bài viết ${addOrUpdate}`
+        }
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width="70%"
+        className={styles.modal}
+        ref={modalRef}
+      >
+        <Form
+          form={form}
+          onFinish={addOrUpdate == 0 ? handleAddPost : handleUpdatePost}
+          {...layout}
+          ref={formPostRef}
+        >
+          <Form.Item
+            label="Tiêu đề"
+            name="title"
+            rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
+          >
+            <TextArea placeholder="Tiêu đề..." autoSize />
+          </Form.Item>
+
+          <Form.Item
+            label="Nội dung"
+            name="content"
+            rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
+          >
+            <TextArea
+              placeholder="Nội dung..."
+              autoSize={{
+                minRows: 3,
+                maxRows: 30,
+              }}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

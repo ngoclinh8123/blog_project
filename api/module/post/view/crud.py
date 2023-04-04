@@ -18,7 +18,7 @@ class PostView(viewsets.GenericViewSet):
 
     def list(self, request):
         # Get paginated posts
-        posts = self.queryset
+        posts = Post.objects.all().order_by("id")
         serializer = PostSr(posts, many=True)
         message = gettext("Retrieved posts successfully.")
         return ResponseUtil.success_response(message, serializer.data)

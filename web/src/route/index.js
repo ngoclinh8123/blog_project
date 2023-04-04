@@ -10,6 +10,7 @@ const Profile = lazy(() => import("/src/page/profile"));
 const Category = lazy(() => import("/src/page/category"));
 const CategoryDetail = lazy(() => import("/src/page/category_detail"));
 const Blog = lazy(() => import("/src/page/blog"));
+const BlogDetail = lazy(() => import("/src/page/blog_detail"));
 const Login = lazy(() => import("/src/page/auth/login"));
 const ResetPassword = lazy(() => import("/src/page/auth/reset_password"));
 const ForgotPassword = lazy(() => import("/src/page/auth/forgot_password"));
@@ -21,7 +22,8 @@ const publicRoutes = [
   { path: "/app/profile", page: Profile, layout: DefaultLayout },
   { path: "/app/category/", page: Category, layout: DefaultLayout },
   { path: "/app/category/:id", page: CategoryDetail, layout: DefaultLayout },
-  { path: "/app/blog/:id", page: Blog, layout: DefaultLayout },
+  { path: "/app/blog/:id", page: BlogDetail, layout: DefaultLayout },
+  { path: "/app/blog/", page: Blog, layout: DefaultLayout },
   { path: "/login", page: Login, layout: Auth },
   { path: "/forgot-password", page: ForgotPassword, layout: Auth },
   { path: "/forgot-password/result", page: SendMailResult, layout: Auth },

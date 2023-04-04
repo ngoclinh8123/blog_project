@@ -40,7 +40,7 @@ function DefaultLayout({ children }) {
       key: "3",
       icon: <FormOutlined />,
       label: "Bài viết",
-      path: "/",
+      path: "/app/blog",
     },
   ];
 
