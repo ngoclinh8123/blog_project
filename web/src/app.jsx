@@ -1,11 +1,38 @@
-import { Fragment, Suspense } from "react";
+import { lazy } from "react";
+import { Fragment, Suspense, useContext } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import { Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { publicRoutes } from "/src/route";
 import defaultLayout from "/src/component/layout/default_layout";
-import axios from "axios";
+import { AuthContext } from "/src/util/context/auth_context";
+
+const Error404 = lazy(() => import("/src/page/error_404"));
+
+// animation loading
+const antIcon = (
+  <LoadingOutlined
+    style={{
+      fontSize: 24,
+    }}
+    spin
+  />
+);
 
 function App() {
+  const { loggedIn, user } = useContext(AuthContext);
+  function checkLogin(require_login) {
+    // if require = true and loggedin
+    if (!require_login) {
+      return true;
+    } else if (require_login) {
+      if (loggedIn) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
   return (
     <BrowserRouter>
       <div className="App">
@@ -24,11 +51,19 @@ function App() {
                 key={index}
                 path={route.path}
                 element={
-                  <Layout>
-                    <Suspense fallback={<div>Loading...</div>}>
-                      <Page />
-                    </Suspense>
-                  </Layout>
+                  checkLogin(route.require_login) ? (
+                    <Layout>
+                      <Suspense fallback={<Spin indicator={antIcon} />}>
+                        <Page />
+                      </Suspense>
+                    </Layout>
+                  ) : (
+                    <Fragment>
+                      <Suspense fallback={<Spin indicator={antIcon} />}>
+                        <Error404 />
+                      </Suspense>
+                    </Fragment>
+                  )
                 }
               />
             );

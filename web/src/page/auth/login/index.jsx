@@ -23,7 +23,7 @@ function Login() {
             if (response) {
               message.success("Login success");
               handleLogin(response.data.data);
-              navigate("/");
+              navigate("/app/profile");
             }
           })
           .catch((e) => {});
