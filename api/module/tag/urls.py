@@ -5,4 +5,4 @@ BASE_ENDPOINT = CategoryView.as_view({"get": "list", "post": "add"})
 
 PK_ENDPOINT = CategoryView.as_view({"put": "change", "delete": "delete"})
 
-urlpatterns = [path("api/", BASE_ENDPOINT), path("api/<int:pk>", PK_ENDPOINT)]
+urlpatterns = [path("", BASE_ENDPOINT), path("<int:pk>/", PK_ENDPOINT)]

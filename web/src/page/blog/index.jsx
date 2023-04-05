@@ -160,10 +160,9 @@ function Blog() {
 
   function getPost() {
     api
-      .get(`/posts/api`)
+      .get(`/api/v1/post/`)
       .then((response) => {
         if (response) {
-          console.log("get post scc");
           setPosts(response.data.data);
         }
       })
@@ -215,7 +214,7 @@ function Blog() {
 
   function callDeletePost(id) {
     api
-      .delete(`/posts/api/${id}`)
+      .delete(`/api/v1/post/${id}/`)
       .then((response) => {
         message.success(`Xóa bài viết ${id} thành công`);
         getPost();
@@ -241,7 +240,7 @@ function Blog() {
   const handleUpdatePost = (values) => {
     if (loggedIn) {
       api
-        .put(`/posts/api/${addOrUpdate}`, {
+        .put(`/api/v1/post/${addOrUpdate}/`, {
           title: values.title,
           content: values.content,
         })
@@ -278,7 +277,7 @@ function Blog() {
 
     // // add new post to database
     api
-      .post(`/posts/api/`, { title: title, content: content })
+      .post(`/api/v1/post/`, { title: title, content: content })
       .then((response) => {
         getPost();
         setIsModalOpen(false);

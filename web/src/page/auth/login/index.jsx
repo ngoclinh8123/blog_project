@@ -11,14 +11,14 @@ function Login() {
 
   function onFinish(values) {
     api
-      .post("/auth/token/", {
+      .post("/api/v1/auth/token/", {
         username: values.username,
         password: values.password,
       })
       .then((response) => {
         // get user information
         api
-          .get("/auth/user_info/")
+          .get("/api/v1/auth/user-info/")
           .then((response) => {
             if (response) {
               message.success("Login success");

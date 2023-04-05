@@ -7,7 +7,7 @@ function ResetPassword() {
   const navigate = useNavigate();
 
   function onFinish(values) {
-    const url = `${import.meta.env.VITE_URL_API}/auth/reset_password/`;
+    const url = `${import.meta.env.VITE_URL_API}/api/v1/auth/reset-password/`;
     const new_password = values["password"];
 
     // get token from url

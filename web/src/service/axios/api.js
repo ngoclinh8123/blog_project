@@ -24,7 +24,10 @@ export function setOnTokenRefreshed(callback) {
 // Function to send a request to refresh the access token
 async function refresh_token() {
   try {
-    await axios.post(`${import.meta.env.VITE_URL_API}/auth/token/refresh/`, {});
+    await axios.post(
+      `${import.meta.env.VITE_URL_API}/api/v1/auth/token/refresh/`,
+      {}
+    );
 
     // Call the callback function when the access token is refreshed
     onTokenRefreshed();

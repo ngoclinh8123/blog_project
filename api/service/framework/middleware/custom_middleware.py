@@ -11,11 +11,11 @@ class RequiredCheckTokenSignature:
 
     def __call__(self, request):
         allow_path = (
-            "/auth/token/",
-            "/auth/token/refresh/",
-            "/auth/forgot_password/",
-            "/auth/logout/",
-            "/auth/reset_password/",
+            "/api/v1/auth/token/",
+            "/api/v1/auth/token/refresh/",
+            "/api/v1/auth/forgot_password/",
+            "/api/v1/auth/logout/",
+            "/api/v1/auth/reset_password/",
         )
         if request.path_info not in allow_path:
             token = request.COOKIES.get("token", "")
@@ -27,7 +27,9 @@ class RequiredCheckTokenSignature:
                 if not User.objects.filter(token_signature=signature).count() > 0:
                     print("loi o day")
                     message = gettext("Please login again.")
-                    response = Response(data=message, status=status.HTTP_400_BAD_REQUEST)
+                    response = Response(
+                        data=message, status=status.HTTP_400_BAD_REQUEST
+                    )
                     response.accepted_renderer = JSONRenderer()
                     response.accepted_media_type = "application/json"
                     response.renderer_context = {}

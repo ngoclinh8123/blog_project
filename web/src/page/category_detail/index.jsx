@@ -162,7 +162,7 @@ function CategoryDetail() {
 
   function getPost() {
     api
-      .get(`/categories/api/${id}`)
+      .get(`/api/v1/category/${id}/`)
       .then((response) => {
         if (response) {
           setPosts(response.data.data);
@@ -177,7 +177,7 @@ function CategoryDetail() {
 
   function getCategory() {
     api
-      .get("/categories/api")
+      .get("/api/v1/category/")
       .then((response) => {
         if (response) {
           setCategory(response.data.data);
@@ -259,7 +259,7 @@ function CategoryDetail() {
 
   function callDeletePost(id) {
     api
-      .delete(`/posts/api/${id}`)
+      .delete(`/api/v1/post/${id}/`)
       .then((response) => {
         message.success(`Delete post ${id} successfully`);
         getPost();
@@ -285,7 +285,7 @@ function CategoryDetail() {
   const handleUpdatePost = (values) => {
     if (loggedIn) {
       api
-        .put(`/posts/api/${addOrUpdate}`, {
+        .put(`/api/v1/post/${addOrUpdate}/`, {
           title: values.title,
           content: values.content,
         })
@@ -323,7 +323,7 @@ function CategoryDetail() {
 
     // // add new post to database
     api
-      .post(`/posts/api/`, { title: title, content: content })
+      .post(`/api/v1/post/`, { title: title, content: content })
       .then((response) => {
         // add post success but no add in posts in category
         const arrPostId = gatherPostId();
@@ -331,7 +331,7 @@ function CategoryDetail() {
         arrPostId.push(newPostId);
         // update category with new post
         api
-          .put(`/categories/api/${id}/`, {
+          .put(`/api/v1/category/${id}/`, {
             title: category.title,
             parent_id: category.parent_id,
             posts: arrPostId,

@@ -56,7 +56,7 @@ function Category() {
 
   function getCategory() {
     api
-      .get("/categories/api")
+      .get("/api/v1/category/")
       .then((response) => {
         if (response) {
           setCategory(response.data.data);
@@ -71,7 +71,7 @@ function Category() {
 
   function getPost() {
     api
-      .get(`/posts/api`)
+      .get(`/api/v1/post/`)
       .then((response) => {
         if (response) {
           setPosts(response.data.data);
@@ -305,7 +305,7 @@ function Category() {
 
     if (loggedIn) {
       api
-        .post(`/categories/api/`, {
+        .post(`/api/v1/category/`, {
           title: values.title,
           parent_id: values.parent_id,
           posts: values.posts,
@@ -331,19 +331,23 @@ function Category() {
     }
   }
 
+  function callDeleteCategory(id) {
+    api
+      .delete(`/api/v1/category/${id}/`)
+      .then((response) => {
+        getCategory();
+        message.success(`Xóa danh mục ${id} thành công`);
+      })
+      .catch((e) => {
+        if (e.response.status === 403) {
+          message.error(`Bạn không có quyền xóa danh mục ${id}`);
+        }
+      });
+  }
+
   function handleClickDeleteCategory(id) {
     if (loggedIn) {
-      api
-        .delete(`/categories/api/${id}`)
-        .then((response) => {
-          getCategory();
-          message.success("Xóa danh mục thành công");
-        })
-        .catch((e) => {
-          if (e.response.status === 403) {
-            message.error("Bạn không có quyền xóa danh mục");
-          }
-        });
+      callDeleteCategory(id);
     } else {
       message.error("Vui lòng đăng nhập để thực hiện hành động này");
       setIsModalOpen(false);
@@ -351,7 +355,9 @@ function Category() {
   }
 
   function handleDeleteCategories() {
-    console.log("delete many itme");
+    if (selectedRowKeys.length > 0) {
+      selectedRowKeys.forEach((id) => callDeleteCategory(id));
+    }
   }
 
   function handleClickEditCategory(id) {
@@ -366,7 +372,7 @@ function Category() {
 
     if (loggedIn) {
       api
-        .put(`/categories/api/${addOrUpdate}/`, {
+        .put(`/api/v1/category/${addOrUpdate}/`, {
           title: values.title,
           parent_id: values.parent_id,
           posts: values.posts,

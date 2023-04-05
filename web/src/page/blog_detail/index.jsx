@@ -41,7 +41,7 @@ function BlogDetail() {
 
   function getPost() {
     api
-      .get(`/posts/api/${id}`)
+      .get(`/api/v1/post/${id}/`)
       .then((response) => {
         setBlog(response.data.data);
       })
@@ -50,7 +50,7 @@ function BlogDetail() {
 
   function getComments() {
     api
-      .get(`/comments/api/${id}`)
+      .get(`/api/v1/comment/${id}/`)
       .then((response) => {
         setComments(response.data.data);
       })
@@ -59,7 +59,7 @@ function BlogDetail() {
 
   function handleDeleteComment(id) {
     api
-      .delete(`/comments/api/${id}`)
+      .delete(`/api/v1/comment/${id}/`)
       .then((response) => {
         getComments();
       })
@@ -73,7 +73,7 @@ function BlogDetail() {
     formCommentRef.current.resetFields();
     if (loggedIn) {
       api
-        .post(`/comments/api/`, {
+        .post(`/api/v1/comment/`, {
           parent_id: parent_id,
           content: content,
           post: post,

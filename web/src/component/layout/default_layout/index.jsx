@@ -78,7 +78,7 @@ function DefaultLayout({ children }) {
 
   function handleClickLogout() {
     api
-      .post("/auth/logout/")
+      .post("/api/v1/auth/logout/")
       .then((response) => {
         message.success("Đăng xuất thành công");
         handleLogout();

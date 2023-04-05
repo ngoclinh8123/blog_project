@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
   // Use an effect hook to fetch the user information from the API when the refresh flag changes
   useEffect(() => {
     api
-      .get("/auth/user_info/")
+      .get("/api/v1/auth/user-info/")
       .then((response) => {
         if (response) {
           handleLogin(response.data.data);

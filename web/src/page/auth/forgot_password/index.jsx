@@ -32,7 +32,7 @@ function ForgotPassword() {
       message.warning("Please enter your email");
     } else {
       api
-        .post("/auth/forgot_password/", { email: email })
+        .post("/api/v1/auth/forgot-password/", { email: email })
         .then((response) => {
           navigate("/forgot-password/result");
         })
