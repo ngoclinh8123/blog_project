@@ -74,7 +74,7 @@ function Category() {
       .get(`/api/v1/post/`)
       .then((response) => {
         if (response) {
-          setPosts(response.data.data);
+          setPosts(response.data.data.items);
         }
       })
       .catch((e) => {
@@ -439,6 +439,7 @@ function Category() {
         dataSource={data}
         onChange={onChange}
         className={styles.table}
+        paginations={false}
       />
       <div
         style={{

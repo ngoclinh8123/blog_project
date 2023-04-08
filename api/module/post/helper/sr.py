@@ -16,6 +16,14 @@ class CustomerSerializer(serializers.ModelSerializer):
         ]
 
 
+class PostAllSr(serializers.ModelSerializer):
+    customer = CustomerSerializer()
+
+    class Meta:
+        model = Post
+        exclude = ("content",)
+
+
 class PostSr(serializers.ModelSerializer):
     customer = CustomerSerializer()
 

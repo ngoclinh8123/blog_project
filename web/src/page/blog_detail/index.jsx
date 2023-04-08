@@ -110,7 +110,10 @@ function BlogDetail() {
           {/* post block */}
           <div className={styles.post_content}>
             <h2 className={styles.title}>{blog.title}</h2>
-            <p className={styles.content}>{blog.content}</p>
+            <div
+              dangerouslySetInnerHTML={{ __html: blog.content }}
+              className={styles.content}
+            />
             <div className={styles.post_info}>
               <div className={styles.post_info_content}>
                 <span>{convertDate(blog.created_at)}</span>

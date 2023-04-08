@@ -5,7 +5,6 @@ class PaginationUtil:
     @staticmethod
     def has_pagination(request, totalItem, page_size):
         currentPage = int(request.GET.get("page", 1))
-        host = request.META.get("HTTP_HOST")
         path = request.META.get("PATH_INFO")
         paginations = {}
         paginations["page_size"] = page_size
@@ -16,14 +15,14 @@ class PaginationUtil:
             paginations["link"] = {}
             if paginations["current_page"] < paginations["total_page"]:
                 paginations["link"]["next"] = "{}?page={}".format(
-                    host + path, paginations["current_page"] + 1
+                    path, paginations["current_page"] + 1
                 )
             else:
                 paginations["link"]["next"] = ""
 
             if paginations["current_page"] > 1:
                 paginations["link"]["prev"] = "{}?page={}".format(
-                    host + path, paginations["current_page"] - 1
+                    path, paginations["current_page"] - 1
                 )
             else:
                 paginations["link"]["prev"] = ""

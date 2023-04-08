@@ -9,7 +9,6 @@ const Home = lazy(() => import("/src/page/home"));
 const Profile = lazy(() => import("/src/page/profile"));
 const Category = lazy(() => import("/src/page/category"));
 const CategoryDetail = lazy(() => import("/src/page/category_detail"));
-const Error404 = lazy(() => import("/src/page/error_404"));
 const Blog = lazy(() => import("/src/page/blog"));
 const BlogDetail = lazy(() => import("/src/page/blog_detail"));
 const Login = lazy(() => import("/src/page/auth/login"));
@@ -50,7 +49,6 @@ const publicRoutes = [
     layout: DefaultLayout,
     require_login: true,
   },
-  { path: "/404", page: Error404, layout: null, require_login: false },
   { path: "/login", page: Login, layout: Auth, require_login: false },
   {
     path: "/forgot-password",

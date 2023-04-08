@@ -42,7 +42,6 @@ function DefaultLayout({ children }) {
     const result = [];
     defineLocations.forEach((item) => {
       if (currentPath.indexOf(item.path) >= 0) {
-        console.log(item.path);
         result.push({ item: item.location, path: item.path });
       }
     });

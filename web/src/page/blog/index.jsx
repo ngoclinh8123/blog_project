@@ -1,12 +1,18 @@
 import { useState, useEffect, useContext, useRef } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Form, Input, message, Table, Modal } from "antd";
 import {
   PlusOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  LeftOutlined,
+  RightOutlined,
 } from "@ant-design/icons";
+// react quill
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
 import convertDate from "/src/util/convert_date";
@@ -73,7 +79,7 @@ function Blog() {
       filters: handleCustomerFilter(),
       filterMode: "tree",
       filterSearch: true,
-      onFilter: (value, record) => record.title.includes(value),
+      onFilter: (value, record) => record.customer.includes(value),
       width: "15%",
     },
     {
@@ -125,8 +131,8 @@ function Blog() {
 
   function handlePostData() {
     const result = [];
-    if (posts.length > 0) {
-      posts.forEach((post) => {
+    if (posts.items && posts.items.length > 0) {
+      posts.items.forEach((post) => {
         result.push({
           key: post.id,
           id: post.id,
@@ -143,8 +149,8 @@ function Blog() {
   function handleCustomerFilter() {
     const result = [];
     const arrCustomer = [];
-    if (posts.length > 0) {
-      posts.forEach((post) => {
+    if (posts.items && posts.items.length > 0) {
+      posts.items.forEach((post) => {
         if (!arrCustomer.includes(post.customer.username)) {
           arrCustomer.push(post.customer.username);
         }
@@ -158,9 +164,10 @@ function Blog() {
     return result;
   }
 
-  function getPost() {
+  function getPost(path = "/api/v1/post/") {
+    console.warn("call get post");
     api
-      .get(`/api/v1/post/`)
+      .get(path)
       .then((response) => {
         if (response) {
           setPosts(response.data.data);
@@ -186,8 +193,8 @@ function Blog() {
 
   function getInfoPost(id) {
     let result = {};
-    if (posts.length > 0) {
-      posts.forEach((post) => {
+    if (posts.items && posts.items.length > 0) {
+      posts.items.forEach((post) => {
         if (id == post.id) {
           result = post;
         }
@@ -309,6 +316,27 @@ function Blog() {
     formPostRef.current.resetFields();
   };
 
+  // pagination
+  function handleClickPrevBtn() {
+    getPost(posts.pagination.link.prev);
+  }
+
+  function handleClickNextBtn() {
+    getPost(posts.pagination.link.next);
+  }
+
+  console.log("reload page");
+
+  const handleImageUpload = (file) => {
+    // Xử lý upload file hình ảnh ở đây và trả về đường dẫn file
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   return (
     <div className={styles.container}>
       <div>
@@ -318,6 +346,7 @@ function Blog() {
           dataSource={data}
           onChange={onChange}
           className={styles.table}
+          pagination={false}
         />
         <div
           style={{
@@ -344,6 +373,42 @@ function Blog() {
             {hasSelected ? `Đã chọn ${selectedRowKeys.length} bài viết` : ""}
           </span>
         </div>
+        <div className={styles.pagination}>
+          {posts.pagination &&
+          posts.pagination.link &&
+          posts.pagination.link.prev ? (
+            <span
+              className={styles.pagination_item}
+              onClick={() => handleClickPrevBtn()}
+            >
+              <LeftOutlined />
+            </span>
+          ) : (
+            <span className={styles.pagination_item_fake}>
+              <LeftOutlined />
+            </span>
+          )}
+
+          <span className={styles.pagination_cr_page} title="current page">
+            {posts.pagination && posts.pagination.current_page
+              ? posts.pagination.current_page
+              : 1}
+          </span>
+          {posts.pagination &&
+          posts.pagination.link &&
+          posts.pagination.link.next ? (
+            <span
+              className={styles.pagination_item}
+              onClick={() => handleClickNextBtn()}
+            >
+              <RightOutlined />
+            </span>
+          ) : (
+            <span className={styles.pagination_item_fake}>
+              <RightOutlined />
+            </span>
+          )}
+        </div>
       </div>
       <Modal
         title={
@@ -369,18 +434,36 @@ function Blog() {
           >
             <TextArea placeholder="Tiêu đề..." autoSize />
           </Form.Item>
-
           <Form.Item
             label="Nội dung"
             name="content"
             rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
           >
-            <TextArea
+            <ReactQuill
               placeholder="Nội dung..."
-              autoSize={{
-                minRows: 3,
-                maxRows: 30,
+              modules={{
+                toolbar: [
+                  [{ header: [1, 2, 3, false] }],
+                  ["bold", "italic", "underline", "strike"],
+                  [{ list: "ordered" }, { list: "bullet" }],
+                  ["link", "image"],
+                  ["clean"],
+                ],
+                clipboard: {
+                  matchVisual: false,
+                },
               }}
+              formats={[
+                "header",
+                "bold",
+                "italic",
+                "underline",
+                "strike",
+                "list",
+                "bullet",
+                "link",
+                "image",
+              ]}
             />
           </Form.Item>
         </Form>
