@@ -165,7 +165,6 @@ function Blog() {
   }
 
   function getPost(path = "/api/v1/post/") {
-    console.warn("call get post");
     api
       .get(path)
       .then((response) => {
