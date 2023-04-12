@@ -25,7 +25,6 @@ class RequiredCheckTokenSignature:
                 signature = token.split(".")[-1]
                 User = get_user_model()
                 if not User.objects.filter(token_signature=signature).count() > 0:
-                    print("loi o day")
                     message = gettext("Please login again.")
                     response = Response(
                         data=message, status=status.HTTP_400_BAD_REQUEST
