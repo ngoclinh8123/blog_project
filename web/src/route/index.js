@@ -20,7 +20,7 @@ const SendMailResult = lazy(() => import("/src/page/auth/send_mail_result"));
 const publicRoutes = [
   { path: "/", page: Home, layout: null, require_login: false },
   {
-    path: "/app/profile",
+    path: "/app/profile/",
     page: Profile,
     layout: DefaultLayout,
     require_login: true,
@@ -44,12 +44,12 @@ const publicRoutes = [
     require_login: true,
   },
   {
-    path: "/app/blog/",
+    path: "/app/blog",
     page: Blog,
     layout: DefaultLayout,
     require_login: true,
   },
-  { path: "/login", page: Login, layout: Auth, require_login: false },
+  { path: "/login/", page: Login, layout: Auth, require_login: false },
   {
     path: "/forgot-password",
     page: ForgotPassword,

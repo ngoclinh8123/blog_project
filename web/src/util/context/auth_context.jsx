@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [user, setUser] = useState({});
+  const path = window.location.pathname;
 
   const handleLogin = (user) => {
     setLoggedIn(true);
@@ -20,14 +21,17 @@ export const AuthProvider = ({ children }) => {
 
   // Use an effect hook to fetch the user information from the API when the refresh flag changes
   useEffect(() => {
-    api
-      .get("/api/v1/auth/user-info/")
-      .then((response) => {
-        if (response) {
-          handleLogin(response.data.data);
-        }
-      })
-      .catch((e) => {});
+    if (path != "/") {
+      console.log("aaaaaa");
+      api
+        .get("/api/v1/auth/user-info/")
+        .then((response) => {
+          if (response) {
+            handleLogin(response.data.data);
+          }
+        })
+        .catch((e) => {});
+    }
   }, [refresh]);
 
   // Use an effect hook to set the onTokenRefreshed callback to update the refresh flag

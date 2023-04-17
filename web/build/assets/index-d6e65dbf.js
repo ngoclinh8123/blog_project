@@ -1,1 +1,0 @@
-import{j as n,a as c}from"./index-28c0da10.js";const e="_container_n82hx_1",o="_content_n82hx_9",t={container:e,content:o};function r(){return n("div",{className:t.container,children:c("div",{className:t.content,children:[n("span",{children:"404"}),n("span",{children:"Not Found !"})]})})}export{r as default};
