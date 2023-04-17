@@ -1,0 +1,1 @@
+import{a as i,j as e,L as n}from"./index-28c0da10.js";function r(){return i("div",{children:[e("h2",{children:"Home page"}),e(n,{to:"/login",children:e("h2",{children:"Login"})})]})}export{r as default};

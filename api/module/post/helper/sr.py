@@ -21,7 +21,7 @@ class PostAllSr(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        exclude = ("content",)
+        fields= "__all__"
 
 
 class PostSr(serializers.ModelSerializer):

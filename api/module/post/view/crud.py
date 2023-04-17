@@ -22,7 +22,6 @@ class PostView(viewsets.GenericViewSet):
         posts = CustomPageNumberPagination().paginate_queryset(
             self.queryset, self.request, view=self
         )
-        # posts = Post.objects.all().order_by("id")
         serializer = PostAllSr(posts, many=True)
         pagination = PaginationUtil.has_pagination(
             self.request,
@@ -42,7 +41,7 @@ class PostView(viewsets.GenericViewSet):
     @action(detail=False, methods=["post"])
     def add(self, request):
         customer = get_object_or_404(Customer, user=request.user.id)
-        # ImageUtil.handle_image_base64(request.data["content"])
+        request.data["content"]=ImageUtil.handle_image_base64(request.data["content"])
 
         data = request.data.copy()
         data.update(
@@ -57,7 +56,8 @@ class PostView(viewsets.GenericViewSet):
         if serializer.is_valid():
             post = serializer.save()
             message = gettext("Created post successfully.")
-            return ResponseUtil.success_response(message, post.id)
+            # return ResponseUtil.success_response(message, post.id)
+            return ResponseUtil.success_response(message)
             # return ResponseUtil.success_response(message)
         message = gettext("Failed to create post.")
         return ResponseUtil.fail_response(message)

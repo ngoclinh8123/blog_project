@@ -323,18 +323,7 @@ function Blog() {
   function handleClickNextBtn() {
     getPost(posts.pagination.link.next);
   }
-
-  console.log("reload page");
-
-  const handleImageUpload = (file) => {
-    // Xử lý upload file hình ảnh ở đây và trả về đường dẫn file
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
+  
 
   return (
     <div className={styles.container}>
@@ -439,6 +428,7 @@ function Blog() {
             rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
           >
             <ReactQuill
+
               placeholder="Nội dung..."
               modules={{
                 toolbar: [

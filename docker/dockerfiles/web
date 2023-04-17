@@ -9,3 +9,6 @@ RUN npm run build
 FROM nginx:stable-alpine
 COPY --from=build /code/build /usr/share/nginx/html
 
+# ADD ./package.json /code/
+# RUN yarn
+
