@@ -53,11 +53,13 @@ INSTALLED_APPS = [
     "module.category",
     "module.tag",
     "module.comment",
+    "module.image_content",
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
     "rest_framework.authtoken",
     "django_rest_passwordreset",
+    "django_cron",
 ]
 
 REST_FRAMEWORK = {

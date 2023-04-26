@@ -5,5 +5,6 @@ urlpatterns = [
     path("post/", include("module.post.urls")),
     path("comment/", include("module.comment.urls")),
     path("category/", include("module.category.urls")),
-    path("auth/", include("module.auth.basic_auth.url")),
+    path("auth/", include("module.auth.basic_auth.urls")),
+    path("image-content/", include("module.image_content.urls")),
 ]

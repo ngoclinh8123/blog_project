@@ -12,10 +12,15 @@ import {
 // react quill
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-
+import EditorJS from "@editorjs/editorjs";
+import Header from "@editorjs/header";
+import LinkTool from "@editorjs/link";
+import ImageTool from "@editorjs/image";
+import List from "@editorjs/list";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
 import convertDate from "/src/util/convert_date";
+import { cleanEditorJS } from "/src/util/clean_editor_js";
 import styles from "./blog.module.css";
 
 const onChange = (pagination, filters, sorter, extra) => {
@@ -25,10 +30,15 @@ const onChange = (pagination, filters, sorter, extra) => {
 function Blog() {
   const [posts, setPosts] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [addOrUpdate, setAddOrUpdate] = useState(0);
+  const [addOrUpdate, setAddOrUpdate] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { loggedIn, handleLogout } = useContext(AuthContext);
+  const [content, setContent] = useState([]);
+
+  const handleGetContent = (content) => {
+    setContent(content);
+  };
 
   // table
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -127,6 +137,8 @@ function Blog() {
     },
   ];
 
+  const editorRef = useRef(null);
+
   const data = handlePostData();
 
   function handlePostData() {
@@ -173,7 +185,7 @@ function Blog() {
         }
       })
       .catch((e) => {
-        if (e.response.status === 404) {
+        if (e.response && e.response.status === 404) {
           setPosts({});
         }
       });
@@ -245,24 +257,26 @@ function Blog() {
 
   const handleUpdatePost = (values) => {
     if (loggedIn) {
-      api
-        .put(`/api/v1/post/${addOrUpdate}/`, {
-          title: values.title,
-          content: values.content,
-        })
-        .then((response) => {
-          getPost();
-          setIsModalOpen(false);
-          setAddOrUpdate(0);
-          message.success("Cập nhật bài viết thành công");
-        })
-        .catch((e) => {
-          if (e.response.status === 403) {
-            message.error("Bạn không có quyền sửa bài viết này");
+      editorRef.current.save().then((savedData) => {
+        api
+          .put(`/api/v1/post/${addOrUpdate}/`, {
+            title: values.title,
+            content: JSON.stringify(savedData),
+          })
+          .then((response) => {
+            getPost();
             setIsModalOpen(false);
             setAddOrUpdate(0);
-          }
-        });
+            message.success("Cập nhật bài viết thành công");
+          })
+          .catch((e) => {
+            if (e.response.status === 403) {
+              message.error("Bạn không có quyền sửa bài viết này");
+              setIsModalOpen(false);
+              setAddOrUpdate(0);
+            }
+          });
+      });
     } else {
       message.error("Vui lòng đăng nhập để sửa bài viết");
     }
@@ -273,31 +287,64 @@ function Blog() {
   }
 
   function handleClickAddPost() {
+    setAddOrUpdate(0);
     showModal();
   }
 
   const handleAddPost = (values) => {
-    const title = values.title;
-    const content = values.content;
-    formPostRef.current.resetFields();
+    editorRef.current.save().then((savedData) => {
+      const title = values.title;
+      const content = JSON.stringify(savedData);
+      formPostRef.current.resetFields();
 
-    // // add new post to database
-    api
-      .post(`/api/v1/post/`, { title: title, content: content })
-      .then((response) => {
-        getPost();
-        setIsModalOpen(false);
-        message.success("Thêm bài viết thành công");
-      })
-      .catch((e) => {});
+      // add new post to database
+      api
+        .post(`/api/v1/post/`, { title: title, content: content })
+        .then((response) => {
+          getPost();
+          setIsModalOpen(false);
+          message.success("Thêm bài viết thành công");
+        })
+        .catch((e) => {});
+    });
   };
 
   // modal
   // update initialValue of form when item change
   useEffect(() => {
+    const editor = new EditorJS({
+      holder: "editorjs",
+      placeholder: "Nội dung...",
+      tools: {
+        header: {
+          class: Header,
+          inlineToolbar: ["link"],
+        },
+        linkTool: {
+          class: LinkTool,
+        },
+        list: {
+          class: List,
+          inlineToolbar: true,
+        },
+        image: {
+          class: ImageTool,
+          config: {
+            endpoints: {
+              byFile: `${import.meta.env.VITE_URL_API}/api/v1/image-content/`,
+            },
+          },
+        },
+      },
+      data: addOrUpdate ? JSON.parse(getInfoPost(addOrUpdate).content) : null,
+    });
+    editorRef.current = editor;
+
+    // remove redundant codex-editor block
+    cleanEditorJS();
+
     form.setFieldsValue({
       title: getInfoPost(addOrUpdate).title,
-      content: getInfoPost(addOrUpdate).content,
     });
   }, [addOrUpdate]);
 
@@ -311,7 +358,7 @@ function Blog() {
 
   const handleCancel = () => {
     setIsModalOpen(false);
-    setAddOrUpdate(0);
+    setAddOrUpdate(null);
     formPostRef.current.resetFields();
   };
 
@@ -323,7 +370,6 @@ function Blog() {
   function handleClickNextBtn() {
     getPost(posts.pagination.link.next);
   }
-  
 
   return (
     <div className={styles.container}>
@@ -400,7 +446,7 @@ function Blog() {
       </div>
       <Modal
         title={
-          addOrUpdate == 0 ? "Thêm bài viết mới" : `Sửa bài viết ${addOrUpdate}`
+          addOrUpdate ? `Sửa bài viết ${addOrUpdate}` : "Thêm bài viết mới"
         }
         open={isModalOpen}
         onOk={handleOk}
@@ -411,7 +457,7 @@ function Blog() {
       >
         <Form
           form={form}
-          onFinish={addOrUpdate == 0 ? handleAddPost : handleUpdatePost}
+          onFinish={addOrUpdate ? handleUpdatePost : handleAddPost}
           {...layout}
           ref={formPostRef}
         >
@@ -419,41 +465,19 @@ function Blog() {
             label="Tiêu đề"
             name="title"
             rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
           >
             <TextArea placeholder="Tiêu đề..." autoSize />
           </Form.Item>
           <Form.Item
             label="Nội dung"
             name="content"
-            rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
+            // rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
           >
-            <ReactQuill
-
-              placeholder="Nội dung..."
-              modules={{
-                toolbar: [
-                  [{ header: [1, 2, 3, false] }],
-                  ["bold", "italic", "underline", "strike"],
-                  [{ list: "ordered" }, { list: "bullet" }],
-                  ["link", "image"],
-                  ["clean"],
-                ],
-                clipboard: {
-                  matchVisual: false,
-                },
-              }}
-              formats={[
-                "header",
-                "bold",
-                "italic",
-                "underline",
-                "strike",
-                "list",
-                "bullet",
-                "link",
-                "image",
-              ]}
-            />
+            <div id="editorjs"></div>
           </Form.Item>
         </Form>
       </Modal>

@@ -80,3 +80,7 @@
   border: 1px solid #eee;
   color: #0095ff;
 }
+
+.codex-editor__redactor {
+  padding-bottom: 0;
+}

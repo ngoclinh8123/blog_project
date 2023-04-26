@@ -41,8 +41,7 @@ class PostView(viewsets.GenericViewSet):
     @action(detail=False, methods=["post"])
     def add(self, request):
         customer = get_object_or_404(Customer, user=request.user.id)
-        request.data["content"]=ImageUtil.handle_image_base64(request.data["content"])
-
+        content = request.data["content"]
         data = request.data.copy()
         data.update(
             {
@@ -55,6 +54,7 @@ class PostView(viewsets.GenericViewSet):
         serializer = AddPostSr(data=data)
         if serializer.is_valid():
             post = serializer.save()
+            ImageUtil.handle_collect_image(content, post.id)
             message = gettext("Created post successfully.")
             # return ResponseUtil.success_response(message, post.id)
             return ResponseUtil.success_response(message)
@@ -81,7 +81,7 @@ class PostView(viewsets.GenericViewSet):
     @action(detail=True, methods=["delete"])
     def delete(self, request, pk=None):
         post = get_object_or_404(self.queryset, pk=pk)
-
+        ImageUtil.handle_delete_image_content(post.content)
         # check if user is author or staff
         self.check_object_permissions(request, post)
 

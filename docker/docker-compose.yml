@@ -55,8 +55,8 @@ services:
       - ../web/node_modules:/code/node_modules
     ports:
       - "5173:80"
-    command: nginx -g "daemon off;"
+    # command: nginx -g "daemon off;"
     # ports:
     #   - "5173:80"
-    # command: npm run dev
+    command: npm run dev
     tty: true

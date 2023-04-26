@@ -47,7 +47,7 @@ const publicRoutes = [
     path: "/app/blog",
     page: Blog,
     layout: DefaultLayout,
-    require_login: true,
+    require_login: false,
   },
   { path: "/login/", page: Login, layout: Auth, require_login: false },
   {
