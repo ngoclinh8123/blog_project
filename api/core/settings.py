@@ -60,15 +60,14 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "django_rest_passwordreset",
     "django_cron",
+    "django_crontab",
 ]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
 }
 
 AUTH_USER_MODEL = "basic_auth.User"
@@ -214,3 +213,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+
+CRON_CLASSES = [
+    "service.django_cron.clear_image.ClearImage",
+]

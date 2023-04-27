@@ -296,6 +296,7 @@ function Blog() {
       const title = values.title;
       const content = JSON.stringify(savedData);
       formPostRef.current.resetFields();
+      setAddOrUpdate(null);
 
       // add new post to database
       api

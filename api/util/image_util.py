@@ -57,10 +57,21 @@ class ImageUtil:
     def handle_delete_image(path):
         if path.startswith("/"):
             path = path[1:]
+        print(path)
         try:
             os.remove(path)
         except OSError as e:
             print(f"error: {e.filename} - {e.strerror}")
+
+    @staticmethod
+    def handle_delete_image_in_db(image_path):
+        if image_path.startswith("/"):
+            image_path = image_path[1:]
+        image = ImageContent.objects.get(image=image_path)
+        try:
+            image.delete()
+        except Exception:
+            print("can't delete image ")
 
     @staticmethod
     def handle_delete_image_content(content):
@@ -70,4 +81,5 @@ class ImageUtil:
             for block in blocks:
                 if block["type"] == "image":
                     image = block["data"]["file"]["url"]
+                    ImageUtil.handle_delete_image_in_db(image)
                     ImageUtil.handle_delete_image(image)
