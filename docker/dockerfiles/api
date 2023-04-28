@@ -12,10 +12,19 @@ ADD ./pyproject.toml /code/
 
 RUN python3 -m pip install --upgrade pip
 
-# RUN apt-get update && \
-#     apt-get -y install cron
+RUN apt-get update && \
+    apt-get -y install cron
 
+COPY cronfile /etc/cron.d/cronfile
+
+RUN chmod 0644 /etc/cron.d/cronfile
+
+RUN crontab /etc/cron.d/cronfile
+
+RUN touch /var/log/cron.log
 
 RUN python3 -m pip install --upgrade poetry
 
 RUN poetry install
+
+CMD ["cron", "-f"]

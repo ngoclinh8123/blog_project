@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework.authtoken",
     "django_rest_passwordreset",
-    "django_cron",
     "django_crontab",
 ]
 
@@ -214,6 +213,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 
-CRON_CLASSES = [
-    "service.django_cron.clear_image.ClearImage",
-]
+CRONJOBS = [("0 0 * * *", "module.image_content.cron.my_scheduled_job")]

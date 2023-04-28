@@ -57,7 +57,6 @@ class ImageUtil:
     def handle_delete_image(path):
         if path.startswith("/"):
             path = path[1:]
-        print(path)
         try:
             os.remove(path)
         except OSError as e:
