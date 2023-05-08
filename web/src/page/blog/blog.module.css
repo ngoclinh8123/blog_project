@@ -81,6 +81,43 @@
   color: #0095ff;
 }
 
-.codex-editor__redactor {
-  padding-bottom: 0;
+.form_item_content {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0 12px;
+  border-radius: 8px;
+}
+
+.ce-block__content,
+.ce-toolbar__content {
+  /* max-width: unset; */
+}
+
+.post_content {
+  text-align: justify;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 36px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  color: rgb(76, 1, 1);
+}
+
+.content {
+  margin-top: 12px;
+  font-size: 1.6rem;
+}
+
+.post_info {
+  font-size: 1.5rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 24px 0;
+  text-align: end;
+}
+
+.post_info_content {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
 }

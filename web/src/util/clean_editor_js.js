@@ -7,7 +7,6 @@ function cleanEditorJS() {
       editorBlock.removeChild(codexBlockRedundant);
     }
     const codexRedactor = document.querySelector(".codex-editor__redactor");
-    console.log(codexRedactor);
   }
 }
 export { cleanEditorJS };

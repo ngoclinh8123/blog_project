@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Form, Input, message, Avatar } from "antd";
 import { SendOutlined } from "@ant-design/icons";
+import edjsHTML from "editorjs-html";
 import { AuthContext } from "/src/util/context/auth_context";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import convertDate from "/src/util/convert_date";
@@ -11,7 +12,6 @@ function BlogDetail() {
   const [blog, setBlog] = useState();
   const [comments, setComments] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [showForm, setShowForm] = useState(false);
   const { id } = useParams();
   const formCommentRef = useRef(null);
 
@@ -43,6 +43,13 @@ function BlogDetail() {
     api
       .get(`/api/v1/post/${id}/`)
       .then((response) => {
+        // parse editorjs clean data to html
+        const edjsParser = edjsHTML();
+        const html = edjsParser.parse(
+          JSON.parse(response.data.data["content"])
+        );
+        response.data.data["content"] = html;
+
         setBlog(response.data.data);
       })
       .catch((e) => {});

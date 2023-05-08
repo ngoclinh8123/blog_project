@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Form, Input, message, Table, Modal } from "antd";
+import { useLocation } from "react-router-dom";
+import { Form, Input, message, Table, Modal, Button } from "antd";
 import {
   PlusOutlined,
   DeleteOutlined,
@@ -9,9 +9,6 @@ import {
   LeftOutlined,
   RightOutlined,
 } from "@ant-design/icons";
-// react quill
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import LinkTool from "@editorjs/link";
@@ -21,6 +18,7 @@ import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
 import convertDate from "/src/util/convert_date";
 import { cleanEditorJS } from "/src/util/clean_editor_js";
+import convertContent from "/src/util/convert_content";
 import styles from "./blog.module.css";
 
 const onChange = (pagination, filters, sorter, extra) => {
@@ -31,14 +29,9 @@ function Blog() {
   const [posts, setPosts] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [addOrUpdate, setAddOrUpdate] = useState(null);
+  const [viewItem, setViewItem] = useState(null);
   const location = useLocation();
-  const navigate = useNavigate();
-  const { loggedIn, handleLogout } = useContext(AuthContext);
-  const [content, setContent] = useState([]);
-
-  const handleGetContent = (content) => {
-    setContent(content);
-  };
+  const { loggedIn } = useContext(AuthContext);
 
   // table
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -56,6 +49,7 @@ function Blog() {
   const modalRef = useRef(null);
   const { TextArea } = Input;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalViewOpen, setIsModalViewOpen] = useState(false);
   const [form] = Form.useForm();
   const layout = {
     labelCol: {
@@ -120,7 +114,7 @@ function Blog() {
           <EyeOutlined
             onClick={() => handleClickViewPost(value.key)}
             className={styles.btn_action}
-            title="xem bài viết"
+            title="xem trước bài viết"
           />
           <EditOutlined
             onClick={() => handleClickEditPost(value.key)}
@@ -248,6 +242,7 @@ function Blog() {
     selectedRowKeys.map((id) => {
       callDeletePost(id);
     });
+    setSelectedRowKeys([]);
   }
 
   function handleClickEditPost(id) {
@@ -283,7 +278,8 @@ function Blog() {
   };
 
   function handleClickViewPost(id) {
-    navigate(`/app/blog/${id}`);
+    setViewItem(getInfoPost(id));
+    showModalView();
   }
 
   function handleClickAddPost() {
@@ -313,8 +309,10 @@ function Blog() {
   // modal
   // update initialValue of form when item change
   useEffect(() => {
+    getInfoPost(addOrUpdate).content;
     const editor = new EditorJS({
       holder: "editorjs",
+      minHeight: 0,
       placeholder: "Nội dung...",
       tools: {
         header: {
@@ -353,14 +351,24 @@ function Blog() {
     setIsModalOpen(true);
   };
 
+  const showModalView = () => {
+    setIsModalViewOpen(true);
+  };
+
   const handleOk = () => {
     form.submit();
   };
 
   const handleCancel = () => {
+    if (addOrUpdate != null) {
+      setAddOrUpdate(null);
+    }
     setIsModalOpen(false);
-    setAddOrUpdate(null);
-    formPostRef.current.resetFields();
+  };
+
+  const handleCancelView = () => {
+    setViewItem(null);
+    setIsModalViewOpen(false);
   };
 
   // pagination
@@ -371,6 +379,8 @@ function Blog() {
   function handleClickNextBtn() {
     getPost(posts.pagination.link.next);
   }
+
+  // chinh max-width cua modal
 
   return (
     <div className={styles.container}>
@@ -445,6 +455,7 @@ function Blog() {
           )}
         </div>
       </div>
+      {/* modal with form to add or update */}
       <Modal
         title={
           addOrUpdate ? `Sửa bài viết ${addOrUpdate}` : "Thêm bài viết mới"
@@ -452,8 +463,7 @@ function Blog() {
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
-        width="70%"
-        className={styles.modal}
+        width="700px"
         ref={modalRef}
       >
         <Form
@@ -478,10 +488,41 @@ function Blog() {
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
           >
-            <div id="editorjs"></div>
+            <div id="editorjs" className={styles.form_item_content}></div>
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* modal to view post */}
+      {viewItem != null && (
+        <Modal
+          open={isModalViewOpen}
+          title=""
+          onCancel={handleCancelView}
+          width="700px"
+          footer={[
+            <Button key="back" onClick={handleCancelView} type="primary">
+              OK
+            </Button>,
+          ]}
+        >
+          <div className={styles.post_content}>
+            <h2 className={styles.title}>{viewItem.title}</h2>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: convertContent(viewItem.content).join(""),
+              }}
+              className={styles.content}
+            />
+            <div className={styles.post_info}>
+              <div className={styles.post_info_content}>
+                <span>{convertDate(viewItem.created_at)}</span>
+                <span>{viewItem.customer.username}</span>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
