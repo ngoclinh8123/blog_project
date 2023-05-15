@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 56px;
+  border-top: 1px solid #ccc;
+}
+
+.block_action a,
+.block_logo {
+  color: #6b7280;
+}
+
+.block_logo span {
+  font-size: 1.6rem;
+  margin: 0 4px;
+  font-weight: 400;
+}
+
+.block_action a {
+  margin: 0 8px;
+  font-size: 1.8rem;
+}

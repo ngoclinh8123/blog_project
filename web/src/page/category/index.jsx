@@ -8,6 +8,7 @@ import {
   EyeOutlined,
   LineOutlined,
 } from "@ant-design/icons";
+import CustomBreadCrum from "/src/component/layout/default_layout/bread_crum";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
 import styles from "./category.module.css";
@@ -433,6 +434,7 @@ function Category() {
 
   return (
     <div className={styles.container}>
+      <CustomBreadCrum />
       <Table
         rowSelection={rowSelection}
         columns={columns}

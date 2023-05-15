@@ -5,8 +5,8 @@ from rest_framework.decorators import action
 from module.category.models import Category
 from module.post.models import Post
 from module.post.helper.sr import PostSr
-from module.post.custom_pagination import CustomPageNumberPagination
 from util.pagination_util import PaginationUtil
+from module.post.custom_pagination import CustomPageNumberPagination
 from module.category.helper.sr import CategorySr, AddCategorySr, ChangeCategorySr
 from util.tree_data_processor_util import TreeDataProcessor
 from util.response_util import ResponseUtil
@@ -27,10 +27,29 @@ class CategoryView(viewsets.GenericViewSet):
 
     def retrieve(self, request, pk):
         if type(pk) == int and pk >= 0:
+            category = get_object_or_404(Category, pk=pk)
+
             posts = Post.objects.filter(category__id=pk)
-            serializer = PostSr(posts, many=True)
+            post_paginate = CustomPageNumberPagination().paginate_queryset(
+                posts, self.request, view=self
+            )
+            serializer = PostSr(post_paginate, many=True)
+            pagination = PaginationUtil.has_pagination(
+                self.request,
+                Post.objects.filter(category__id=pk).count(),
+                CustomPageNumberPagination.page_size,
+            )
+            result = {
+                "items": serializer.data,
+                "pagination": pagination,
+                "category": {
+                    "id": category.id,
+                    "title": category.title,
+                    "parent_id": category.parent_id,
+                },
+            }
             message = gettext("Retrieved posts successfully.")
-            return ResponseUtil.success_response(message, serializer.data)
+            return ResponseUtil.success_response(message, result)
 
     @action(methods=["post"], detail=False)
     def add(self, request):

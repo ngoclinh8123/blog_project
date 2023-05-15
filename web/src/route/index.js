@@ -3,6 +3,7 @@ import { lazy } from "react";
 // layout
 import DefaultLayout from "/src/component/layout/default_layout";
 import Auth from "/src/component/layout/auth";
+import Client from "/src/component/layout/client";
 
 // pages
 const Home = lazy(() => import("/src/page/home"));
@@ -18,7 +19,7 @@ const SendMailResult = lazy(() => import("/src/page/auth/send_mail_result"));
 
 // routes
 const publicRoutes = [
-  { path: "/", page: Home, layout: null, require_login: false },
+  { path: "/", page: Home, layout: Client, require_login: false },
   {
     path: "/app/profile/",
     page: Profile,
@@ -38,10 +39,10 @@ const publicRoutes = [
     require_login: true,
   },
   {
-    path: "/app/blog/:id",
+    path: "/blog/:id",
     page: BlogDetail,
-    layout: DefaultLayout,
-    require_login: true,
+    layout: Client,
+    require_login: false,
   },
   {
     path: "/app/blog",

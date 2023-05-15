@@ -94,14 +94,15 @@
 
 .post_content {
   text-align: justify;
-  border-bottom: 1px solid #ccc;
   padding-bottom: 36px;
 }
 
+.post_content img {
+  width: 100%;
+}
+
 .title {
-  font-size: 20px;
-  font-weight: 600;
-  color: rgb(76, 1, 1);
+  /* font-size: 24px; */
 }
 
 .content {
@@ -111,13 +112,9 @@
 
 .post_info {
   font-size: 1.5rem;
-  color: rgba(0, 0, 0, 0.6);
-  margin: 24px 0;
-  text-align: end;
+  color: #9e9e9e;
+  margin: 16px 0 20px;
 }
 
 .post_info_content {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
 }

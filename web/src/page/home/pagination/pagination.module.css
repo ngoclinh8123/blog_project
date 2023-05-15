@@ -1,0 +1,8 @@
+.pagination_wrap {
+  padding: 24px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pagination {
+}

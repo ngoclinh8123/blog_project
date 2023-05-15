@@ -1,0 +1,43 @@
+.item_wrap {
+  margin-top: 40px;
+  display: flex;
+  transition: all linear 0.2s;
+}
+
+.item_wrap:hover {
+  box-shadow: 4px 8px 8px #ddd;
+  transform: translateY(-4px);
+}
+
+.block_img img {
+  width: 192px;
+  height: 192px;
+  object-fit: cover;
+  margin-right: 40px;
+}
+
+.block_content {
+  color: black;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 2.4rem;
+  line-height: 2.8rem;
+  margin-bottom: 8px;
+}
+
+.time {
+  margin-bottom: 16px;
+  color: #4b556a;
+}
+
+.des {
+  color: #1f2937;
+}
+
+.time,
+.des {
+  font-size: 1.6rem;
+  font-weight: 400;
+}

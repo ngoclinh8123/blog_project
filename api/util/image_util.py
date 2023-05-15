@@ -43,7 +43,7 @@ class ImageUtil:
         return re.sub(pattern, _base64_to_img, html_str)
 
     @staticmethod
-    def handle_collect_image(content, postId):
+    def handle_collect_image_content(content, postId):
         data = json.loads(content)
         blocks = data["blocks"]
         if len(blocks) > 0:
@@ -52,6 +52,11 @@ class ImageUtil:
                 if block["type"] == "image":
                     image = block["data"]["file"]["url"]
                     ImageUtil.handle_update_image(image, post)
+
+    @staticmethod
+    def handle_collect_image_desc(image, postId):
+        post = Post.objects.get(id=postId)
+        ImageUtil.handle_update_image(image, post)
 
     @staticmethod
     def handle_delete_image(path):
@@ -82,3 +87,8 @@ class ImageUtil:
                     image = block["data"]["file"]["url"]
                     ImageUtil.handle_delete_image_in_db(image)
                     ImageUtil.handle_delete_image(image)
+
+    @staticmethod
+    def handle_delete_image_desc(image):
+        ImageUtil.handle_delete_image_in_db(image)
+        ImageUtil.handle_delete_image(image)

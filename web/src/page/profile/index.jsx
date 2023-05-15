@@ -1,6 +1,7 @@
-import { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 import { Image, Col, Row } from "antd";
 import { AuthContext } from "/src/util/context/auth_context";
+import CustomBreadCrum from "/src/component/layout/default_layout/bread_crum";
 import convertDate from "/src/util/convert_date";
 import styles from "./profile.module.css";
 
@@ -8,6 +9,7 @@ function Profile() {
   const { user } = useContext(AuthContext);
   return (
     <div className={styles.container}>
+      <CustomBreadCrum />
       <div className={styles.info_container}>
         <div className={styles.image}>
           <Image

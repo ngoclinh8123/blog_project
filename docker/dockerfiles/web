@@ -1,15 +1,15 @@
 FROM node:16.14.2-alpine as build
 RUN mkdir /code
 WORKDIR /code
-ADD ./package*.json /code/
-RUN npm ci
-COPY . .
-RUN npm run build
+# ADD ./package*.json /code/
+# RUN npm ci
+# COPY . .
+# RUN npm run build
 
-FROM nginx:stable-alpine
-COPY ./nginx/default.conf /etc/nginx/conf.d
-COPY --from=build /code/build /usr/share/nginx/html
+# FROM nginx:stable-alpine
+# COPY ./nginx/default.conf /etc/nginx/conf.d
+# COPY --from=build /code/build /usr/share/nginx/html
 
-# ADD ./package.json /code/
-# RUN yarn
+ADD ./package.json /code/
+RUN yarn
 

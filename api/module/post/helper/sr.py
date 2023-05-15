@@ -16,14 +16,6 @@ class CustomerSerializer(serializers.ModelSerializer):
         ]
 
 
-class PostAllSr(serializers.ModelSerializer):
-    customer = CustomerSerializer()
-
-    class Meta:
-        model = Post
-        fields= "__all__"
-
-
 class PostSr(serializers.ModelSerializer):
     customer = CustomerSerializer()
 
@@ -35,10 +27,10 @@ class PostSr(serializers.ModelSerializer):
 class ChangePostSr(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ("title", "content", "slug")
+        fields = ("title", "content", "slug", "desc", "image")
 
 
 class AddPostSr(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ("customer", "mod", "title", "content", "slug")
+        fields = ("customer", "mod", "title", "content", "slug", "desc", "image")

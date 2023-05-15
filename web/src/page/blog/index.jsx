@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { Form, Input, message, Table, Modal, Button } from "antd";
+import { Form, Input, message, Table, Modal, Button, Upload } from "antd";
 import {
   PlusOutlined,
   DeleteOutlined,
@@ -8,12 +8,14 @@ import {
   EyeOutlined,
   LeftOutlined,
   RightOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import LinkTool from "@editorjs/link";
 import ImageTool from "@editorjs/image";
 import List from "@editorjs/list";
+import CustomBreadCrum from "/src/component/layout/default_layout/bread_crum";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
 import convertDate from "/src/util/convert_date";
@@ -50,6 +52,7 @@ function Blog() {
   const { TextArea } = Input;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalViewOpen, setIsModalViewOpen] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState(null);
   const [form] = Form.useForm();
   const layout = {
     labelCol: {
@@ -252,16 +255,23 @@ function Blog() {
 
   const handleUpdatePost = (values) => {
     if (loggedIn) {
+      const image = values.image
+        ? values.image.file.response.file.url
+        : getInfoPost(addOrUpdate).image;
+
       editorRef.current.save().then((savedData) => {
         api
           .put(`/api/v1/post/${addOrUpdate}/`, {
             title: values.title,
             content: JSON.stringify(savedData),
+            desc: values.desc,
+            image: image,
           })
           .then((response) => {
             getPost();
             setIsModalOpen(false);
             setAddOrUpdate(0);
+            setCurrentImageUrl(null);
             message.success("Cập nhật bài viết thành công");
           })
           .catch((e) => {
@@ -290,16 +300,29 @@ function Blog() {
   const handleAddPost = (values) => {
     editorRef.current.save().then((savedData) => {
       const title = values.title;
+      const desc = values.desc;
+
+      let image = "";
+      if (values.image.file && values.image.file.response) {
+        image = values.image.file.response.file.url;
+      }
+
       const content = JSON.stringify(savedData);
-      formPostRef.current.resetFields();
-      setAddOrUpdate(null);
 
       // add new post to database
       api
-        .post(`/api/v1/post/`, { title: title, content: content })
+        .post(`/api/v1/post/`, {
+          title: title,
+          content: content,
+          desc: desc,
+          image: image,
+        })
         .then((response) => {
           getPost();
           setIsModalOpen(false);
+          formPostRef.current.resetFields();
+          setAddOrUpdate(null);
+          setCurrentImageUrl(null);
           message.success("Thêm bài viết thành công");
         })
         .catch((e) => {});
@@ -309,7 +332,20 @@ function Blog() {
   // modal
   // update initialValue of form when item change
   useEffect(() => {
-    getInfoPost(addOrUpdate).content;
+    // remove redundant codex-editor block
+    cleanEditorJS();
+
+    const currentPost = getInfoPost(addOrUpdate);
+
+    if (addOrUpdate > 0) {
+      setCurrentImageUrl(currentPost.image);
+    }
+
+    form.setFieldsValue({
+      title: currentPost.title,
+      desc: currentPost.desc,
+    });
+
     const editor = new EditorJS({
       holder: "editorjs",
       minHeight: 0,
@@ -338,13 +374,6 @@ function Blog() {
       data: addOrUpdate ? JSON.parse(getInfoPost(addOrUpdate).content) : null,
     });
     editorRef.current = editor;
-
-    // remove redundant codex-editor block
-    cleanEditorJS();
-
-    form.setFieldsValue({
-      title: getInfoPost(addOrUpdate).title,
-    });
   }, [addOrUpdate]);
 
   const showModal = () => {
@@ -360,10 +389,9 @@ function Blog() {
   };
 
   const handleCancel = () => {
-    if (addOrUpdate != null) {
-      setAddOrUpdate(null);
-    }
     setIsModalOpen(false);
+    setAddOrUpdate(0);
+    setCurrentImageUrl(null);
   };
 
   const handleCancelView = () => {
@@ -380,10 +408,9 @@ function Blog() {
     getPost(posts.pagination.link.next);
   }
 
-  // chinh max-width cua modal
-
   return (
     <div className={styles.container}>
+      <CustomBreadCrum />
       <div>
         <Table
           rowSelection={rowSelection}
@@ -482,6 +509,40 @@ function Blog() {
             <TextArea placeholder="Tiêu đề..." autoSize />
           </Form.Item>
           <Form.Item
+            label="Ảnh mô tả"
+            name="image"
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+          >
+            <Upload
+              // add this key to re render template
+              key={currentImageUrl}
+              action={`${import.meta.env.VITE_URL_API}/api/v1/image-content/`}
+              listType="picture"
+              maxCount={1}
+              defaultFileList={
+                addOrUpdate == 0 ? [] : [{ url: currentImageUrl }]
+              }
+            >
+              <Button icon={<UploadOutlined />}>Upload</Button>
+            </Upload>
+          </Form.Item>
+          <Form.Item
+            label="Mô tả"
+            name="desc"
+            rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+          >
+            <TextArea
+              placeholder="Mô tả..."
+              autoSize={{
+                minRows: 2,
+                maxRows: 6,
+              }}
+            />
+          </Form.Item>
+          <Form.Item
             label="Nội dung"
             name="content"
             // rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
@@ -508,18 +569,18 @@ function Blog() {
         >
           <div className={styles.post_content}>
             <h2 className={styles.title}>{viewItem.title}</h2>
+            <div className={styles.post_info}>
+              <div className={styles.post_info_content}>
+                <span>{convertDate(viewItem.created_at)}</span>
+                {/* <span>{viewItem.customer.username}</span> */}
+              </div>
+            </div>
             <div
               dangerouslySetInnerHTML={{
                 __html: convertContent(viewItem.content).join(""),
               }}
               className={styles.content}
             />
-            <div className={styles.post_info}>
-              <div className={styles.post_info_content}>
-                <span>{convertDate(viewItem.created_at)}</span>
-                <span>{viewItem.customer.username}</span>
-              </div>
-            </div>
           </div>
         </Modal>
       )}

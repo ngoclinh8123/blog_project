@@ -30,26 +30,6 @@ function DefaultLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
-  const { id } = useParams();
-
-  const defineLocations = [
-    { path: "/app/profile", location: "Hồ sơ" },
-    { path: "/app/category", location: "Danh mục" },
-    { path: "/app/blog", location: "Bài viết" },
-  ];
-
-  function getLocation() {
-    const result = [];
-    defineLocations.forEach((item) => {
-      if (currentPath.indexOf(item.path) >= 0) {
-        result.push({ item: item.location, path: item.path });
-      }
-    });
-    if (id) {
-      result.push({ item: id, path: "" });
-    }
-    return result;
-  }
 
   const items_sider = [
     {
@@ -170,30 +150,7 @@ function DefaultLayout({ children }) {
           </Dropdown>
         </Header>
 
-        <MyContent>
-          <div className={styles.position}>
-            <Breadcrumb>
-              {getLocation().map((item) => (
-                <Breadcrumb.Item>
-                  {item.path != "" ? (
-                    <Link to={item.path}>
-                      <span
-                        style={{ fontFamily: "sans-serif", fontWeight: 700 }}
-                      >
-                        {item.item}
-                      </span>
-                    </Link>
-                  ) : (
-                    <span style={{ fontFamily: "sans-serif", fontWeight: 700 }}>
-                      {item.item}
-                    </span>
-                  )}
-                </Breadcrumb.Item>
-              ))}
-            </Breadcrumb>
-          </div>
-          {children}
-        </MyContent>
+        <MyContent>{children}</MyContent>
       </Layout>
     </Layout>
   );

@@ -11,6 +11,8 @@ class ImageContentView(viewsets.ViewSet):
 
     @action(methods=["post"], detail=False)
     def add(self, request):
+        if "file" in self.request.data:
+            self.request.data["image"] = self.request.data["file"]
         serializer = ImageContentSr(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()

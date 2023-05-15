@@ -1,30 +1,41 @@
 import { useState, useEffect, useContext, useRef } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
-import { Form, Input, message, Table, Modal } from "antd";
+import { useLocation, useParams } from "react-router-dom";
+import { Form, Input, message, Table, Modal, Button, Upload } from "antd";
 import {
   PlusOutlined,
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  LeftOutlined,
+  RightOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
+import EditorJS from "@editorjs/editorjs";
+import Header from "@editorjs/header";
+import LinkTool from "@editorjs/link";
+import ImageTool from "@editorjs/image";
+import List from "@editorjs/list";
+import CustomBreadCrum from "/src/component/layout/default_layout/bread_crum";
 import api, { setOnTokenRefreshed } from "/src/service/axios/api";
 import { AuthContext } from "/src/util/context/auth_context";
 import convertDate from "/src/util/convert_date";
+import { cleanEditorJS } from "/src/util/clean_editor_js";
+import convertContent from "/src/util/convert_content";
 import styles from "./category_detail.module.css";
 
 const onChange = (pagination, filters, sorter, extra) => {
   // console.log("params", pagination, filters, sorter, extra);
 };
 
-function CategoryDetail() {
+function Blog() {
   const [posts, setPosts] = useState([]);
-  const [category, setCategory] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  const [addOrUpdate, setAddOrUpdate] = useState(0);
+  const [addOrUpdate, setAddOrUpdate] = useState(null);
+  const [viewItem, setViewItem] = useState(null);
   const location = useLocation();
+  const { loggedIn } = useContext(AuthContext);
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { loggedIn, handleLogout } = useContext(AuthContext);
+  console.log(id);
 
   // table
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -42,6 +53,8 @@ function CategoryDetail() {
   const modalRef = useRef(null);
   const { TextArea } = Input;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalViewOpen, setIsModalViewOpen] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState(null);
   const [form] = Form.useForm();
   const layout = {
     labelCol: {
@@ -75,7 +88,7 @@ function CategoryDetail() {
       filters: handleCustomerFilter(),
       filterMode: "tree",
       filterSearch: true,
-      onFilter: (value, record) => record.title.includes(value),
+      onFilter: (value, record) => record.customer.includes(value),
       width: "15%",
     },
     {
@@ -106,7 +119,7 @@ function CategoryDetail() {
           <EyeOutlined
             onClick={() => handleClickViewPost(value.key)}
             className={styles.btn_action}
-            title="xem bài viết"
+            title="xem trước bài viết"
           />
           <EditOutlined
             onClick={() => handleClickEditPost(value.key)}
@@ -123,12 +136,14 @@ function CategoryDetail() {
     },
   ];
 
+  const editorRef = useRef(null);
+
   const data = handlePostData();
 
   function handlePostData() {
     const result = [];
-    if (posts.length > 0) {
-      posts.forEach((post) => {
+    if (posts.items && posts.items.length > 0) {
+      posts.items.forEach((post) => {
         result.push({
           key: post.id,
           id: post.id,
@@ -145,8 +160,8 @@ function CategoryDetail() {
   function handleCustomerFilter() {
     const result = [];
     const arrCustomer = [];
-    if (posts.length > 0) {
-      posts.forEach((post) => {
+    if (posts.items && posts.items.length > 0) {
+      posts.items.forEach((post) => {
         if (!arrCustomer.includes(post.customer.username)) {
           arrCustomer.push(post.customer.username);
         }
@@ -160,66 +175,24 @@ function CategoryDetail() {
     return result;
   }
 
-  function getPost() {
+  function getPost(path = `/api/v1/category/${id}`) {
     api
-      .get(`/api/v1/category/${id}/`)
+      .get(path)
       .then((response) => {
         if (response) {
+          console.log("ok");
           setPosts(response.data.data);
         }
       })
       .catch((e) => {
-        if (e.response.status === 404) {
+        if (e.response && e.response.status === 404) {
           setPosts({});
         }
       });
   }
 
-  function getCategory() {
-    api
-      .get("/api/v1/category/")
-      .then((response) => {
-        if (response) {
-          setCategory(response.data.data);
-        }
-      })
-      .catch((e) => {
-        if (e.response.status === 404) {
-          setCategory({});
-        }
-      });
-  }
-
-  function getCategoryInfo(id) {
-    let result = { title: "", parent_id: "", posts: [] };
-    if (category.length > 0) {
-      category.forEach((item) => {
-        if (item.id == id) {
-          result = item;
-        }
-        if (item.childs) {
-          item.childs.forEach((child) => {
-            if (child.id == id) {
-              result = child;
-            }
-          });
-        }
-      });
-    }
-    return result;
-  }
-
-  function gatherPostId() {
-    const arrPostId = [];
-    posts.forEach((post) => {
-      arrPostId.push(post.id);
-    });
-    return arrPostId;
-  }
-
   useEffect(() => {
     getPost();
-    getCategory();
   }, [location, refresh]);
 
   // Use an effect hook to set the onTokenRefreshed callback to update the refresh flag
@@ -231,8 +204,8 @@ function CategoryDetail() {
 
   function getInfoPost(id) {
     let result = {};
-    if (posts.length > 0) {
-      posts.forEach((post) => {
+    if (posts.items && posts.items.length > 0) {
+      posts.items.forEach((post) => {
         if (id == post.id) {
           result = post;
         }
@@ -253,7 +226,7 @@ function CategoryDetail() {
       // call api to delete post here
       callDeletePost(id);
     } else {
-      message.error("Please login to do this action");
+      message.error("Vui lòng đăng nhập để thực hiện hành dộng");
     }
   }
 
@@ -261,12 +234,12 @@ function CategoryDetail() {
     api
       .delete(`/api/v1/post/${id}/`)
       .then((response) => {
-        message.success(`Delete post ${id} successfully`);
+        message.success(`Xóa bài viết ${id} thành công`);
         getPost();
       })
       .catch((e) => {
         if (e.response.status === 403) {
-          message.error(`You have no permission to delete post ${id}`);
+          message.error(`Bạn không có quyền xóa bài viết ${id}`);
         }
       });
   }
@@ -275,6 +248,7 @@ function CategoryDetail() {
     selectedRowKeys.map((id) => {
       callDeletePost(id);
     });
+    setSelectedRowKeys([]);
   }
 
   function handleClickEditPost(id) {
@@ -284,79 +258,158 @@ function CategoryDetail() {
 
   const handleUpdatePost = (values) => {
     if (loggedIn) {
-      api
-        .put(`/api/v1/post/${addOrUpdate}/`, {
-          title: values.title,
-          content: values.content,
-        })
-        .then((response) => {
-          getPost();
-          setIsModalOpen(false);
-          setAddOrUpdate(0);
-          message.success("Updated post successfully");
-        })
-        .catch((e) => {
-          if (e.response.status === 403) {
-            message.error("You have no permissions to edit this post");
+      const image = values.image
+        ? values.image.file.response.file.url
+        : getInfoPost(addOrUpdate).image;
+
+      editorRef.current.save().then((savedData) => {
+        api
+          .put(`/api/v1/post/${addOrUpdate}/`, {
+            title: values.title,
+            content: JSON.stringify(savedData),
+            desc: values.desc,
+            image: image,
+          })
+          .then((response) => {
+            getPost();
             setIsModalOpen(false);
             setAddOrUpdate(0);
-          }
-        });
+            setCurrentImageUrl(null);
+            message.success("Cập nhật bài viết thành công");
+          })
+          .catch((e) => {
+            if (e.response.status === 403) {
+              message.error("Bạn không có quyền sửa bài viết này");
+              setIsModalOpen(false);
+              setAddOrUpdate(0);
+            }
+          });
+      });
     } else {
-      message.error("Please login to do this action");
+      message.error("Vui lòng đăng nhập để sửa bài viết");
     }
   };
 
   function handleClickViewPost(id) {
-    navigate(`/app/blog/${id}`);
+    setViewItem(getInfoPost(id));
+    showModalView();
   }
 
   function handleClickAddPost() {
+    setAddOrUpdate(0);
     showModal();
   }
 
-  const handleAddPost = (values) => {
-    const title = values.title;
-    const content = values.content;
-    formPostRef.current.resetFields();
-    const category = getCategoryInfo(id);
+  function getListPostId() {
+    let result = [];
+    if (posts.items && posts.items.length > 0) {
+      posts.items.forEach((x) => result.push(x.id));
+    }
+    return result;
+  }
 
-    // // add new post to database
-    api
-      .post(`/api/v1/post/`, { title: title, content: content })
-      .then((response) => {
-        // add post success but no add in posts in category
-        const arrPostId = gatherPostId();
-        const newPostId = response.data.data;
-        arrPostId.push(newPostId);
-        // update category with new post
-        api
-          .put(`/api/v1/category/${id}/`, {
-            title: category.title,
-            parent_id: category.parent_id,
-            posts: arrPostId,
-          })
-          .then((response) => {
-            message.success("Add post success");
-            setPosts(response.data.data);
-            setIsModalOpen(false);
-          })
-          .catch((e) => {});
-      })
-      .catch((e) => {});
+  const handleAddPost = (values) => {
+    editorRef.current.save().then((savedData) => {
+      const title = values.title;
+      const desc = values.desc;
+
+      let image = "";
+      if (values.image.file && values.image.file.response) {
+        image = values.image.file.response.file.url;
+      }
+
+      const content = JSON.stringify(savedData);
+
+      // add new post to database
+      api
+        .post(`/api/v1/post/`, {
+          title: title,
+          content: content,
+          desc: desc,
+          image: image,
+        })
+        .then((response) => {
+          message.success("Thêm bài viết thành công");
+
+          // add post to category
+          let postList = getListPostId();
+          // add new post to list
+          postList.push(response.data.data);
+          api
+            .put(`/api/v1/category/${id}/`, {
+              title: posts.category.title,
+              parent_id: posts.category.parent_id,
+              posts: postList,
+            })
+            .then((response) => {
+              message.success(
+                `Thêm bài viết thành công vào danh mục ${posts.category.title}`
+              );
+              formPostRef.current.resetFields();
+              setAddOrUpdate(null);
+              setCurrentImageUrl(null);
+              getPost();
+              setIsModalOpen(false);
+            })
+            .catch((e) => {});
+        })
+        .catch((e) => {});
+    });
   };
 
   // modal
   // update initialValue of form when item change
   useEffect(() => {
+    // remove redundant codex-editor block
+    cleanEditorJS();
+
+    const currentPost = getInfoPost(addOrUpdate);
+
+    if (addOrUpdate > 0) {
+      setCurrentImageUrl(currentPost.image);
+    }
+
     form.setFieldsValue({
-      title: getInfoPost(addOrUpdate).title,
-      content: getInfoPost(addOrUpdate).content,
+      title: currentPost.title,
+      desc: currentPost.desc,
     });
+
+    const editor = new EditorJS({
+      holder: "editorjs",
+      minHeight: 0,
+      placeholder: "Nội dung...",
+      tools: {
+        header: {
+          class: Header,
+          inlineToolbar: ["link"],
+        },
+        linkTool: {
+          class: LinkTool,
+        },
+        list: {
+          class: List,
+          inlineToolbar: true,
+        },
+        image: {
+          class: ImageTool,
+          config: {
+            endpoints: {
+              byFile: `${import.meta.env.VITE_URL_API}/api/v1/image-content/`,
+            },
+          },
+        },
+      },
+      data: addOrUpdate ? JSON.parse(getInfoPost(addOrUpdate).content) : null,
+    });
+    editorRef.current = editor;
   }, [addOrUpdate]);
 
   const showModal = () => {
     setIsModalOpen(true);
+  };
+
+  const showModalView = () => {
+    setIsModalViewOpen(true);
   };
 
   const handleOk = () => {
@@ -366,11 +419,26 @@ function CategoryDetail() {
   const handleCancel = () => {
     setIsModalOpen(false);
     setAddOrUpdate(0);
-    formPostRef.current.resetFields();
+    setCurrentImageUrl(null);
   };
+
+  const handleCancelView = () => {
+    setViewItem(null);
+    setIsModalViewOpen(false);
+  };
+
+  // pagination
+  function handleClickPrevBtn() {
+    getPost(posts.pagination.link.prev);
+  }
+
+  function handleClickNextBtn() {
+    getPost(posts.pagination.link.next);
+  }
 
   return (
     <div className={styles.container}>
+      <CustomBreadCrum detail={posts.category ? posts.category.title : ""} />
       <div>
         <Table
           rowSelection={rowSelection}
@@ -378,6 +446,7 @@ function CategoryDetail() {
           dataSource={data}
           onChange={onChange}
           className={styles.table}
+          pagination={false}
         />
         <div
           style={{
@@ -404,21 +473,57 @@ function CategoryDetail() {
             {hasSelected ? `Đã chọn ${selectedRowKeys.length} bài viết` : ""}
           </span>
         </div>
+        <div className={styles.pagination}>
+          {posts.pagination &&
+          posts.pagination.link &&
+          posts.pagination.link.prev ? (
+            <span
+              className={styles.pagination_item}
+              onClick={() => handleClickPrevBtn()}
+            >
+              <LeftOutlined />
+            </span>
+          ) : (
+            <span className={styles.pagination_item_fake}>
+              <LeftOutlined />
+            </span>
+          )}
+
+          <span className={styles.pagination_cr_page} title="current page">
+            {posts.pagination && posts.pagination.current_page
+              ? posts.pagination.current_page
+              : 1}
+          </span>
+          {posts.pagination &&
+          posts.pagination.link &&
+          posts.pagination.link.next ? (
+            <span
+              className={styles.pagination_item}
+              onClick={() => handleClickNextBtn()}
+            >
+              <RightOutlined />
+            </span>
+          ) : (
+            <span className={styles.pagination_item_fake}>
+              <RightOutlined />
+            </span>
+          )}
+        </div>
       </div>
+      {/* modal with form to add or update */}
       <Modal
         title={
-          addOrUpdate == 0 ? "Thêm bài viết mới" : `Sửa bài viết ${addOrUpdate}`
+          addOrUpdate ? `Sửa bài viết ${addOrUpdate}` : "Thêm bài viết mới"
         }
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
-        width="70%"
-        className={styles.modal}
+        width="700px"
         ref={modalRef}
       >
         <Form
           form={form}
-          onFinish={addOrUpdate == 0 ? handleAddPost : handleUpdatePost}
+          onFinish={addOrUpdate ? handleUpdatePost : handleAddPost}
           {...layout}
           ref={formPostRef}
         >
@@ -426,27 +531,89 @@ function CategoryDetail() {
             label="Tiêu đề"
             name="title"
             rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
           >
             <TextArea placeholder="Tiêu đề..." autoSize />
           </Form.Item>
-
           <Form.Item
-            label="Nội dung"
-            name="content"
+            label="Ảnh mô tả"
+            name="image"
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+          >
+            <Upload
+              // add this key to re render template
+              key={currentImageUrl}
+              action={`${import.meta.env.VITE_URL_API}/api/v1/image-content/`}
+              listType="picture"
+              maxCount={1}
+              defaultFileList={
+                addOrUpdate == 0 ? [] : [{ url: currentImageUrl }]
+              }
+            >
+              <Button icon={<UploadOutlined />}>Upload</Button>
+            </Upload>
+          </Form.Item>
+          <Form.Item
+            label="Mô tả"
+            name="desc"
             rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
           >
             <TextArea
-              placeholder="Nội dung..."
+              placeholder="Mô tả..."
               autoSize={{
-                minRows: 3,
-                maxRows: 30,
+                minRows: 2,
+                maxRows: 6,
               }}
             />
           </Form.Item>
+          <Form.Item
+            label="Nội dung"
+            name="content"
+            // rules={[{ required: true, message: "Vui lòng nhập trường này! " }]}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 20 }}
+          >
+            <div id="editorjs" className={styles.form_item_content}></div>
+          </Form.Item>
         </Form>
       </Modal>
+
+      {/* modal to view post */}
+      {viewItem != null && (
+        <Modal
+          open={isModalViewOpen}
+          title=""
+          onCancel={handleCancelView}
+          width="700px"
+          footer={[
+            <Button key="back" onClick={handleCancelView} type="primary">
+              OK
+            </Button>,
+          ]}
+        >
+          <div className={styles.post_content}>
+            <h2 className={styles.title}>{viewItem.title}</h2>
+            <div className={styles.post_info}>
+              <div className={styles.post_info_content}>
+                <span>{convertDate(viewItem.created_at)}</span>
+                {/* <span>{viewItem.customer.username}</span> */}
+              </div>
+            </div>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: convertContent(viewItem.content).join(""),
+              }}
+              className={styles.content}
+            />
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
 
-export default CategoryDetail;
+export default Blog;
